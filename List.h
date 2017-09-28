@@ -28,7 +28,8 @@ struct ListIterator
 {
 	typedef ListNode<T> Node;
 	typedef ListIterator<T, Ref, Ptr> Self;
-	ListIterator()//construction
+	//construction
+	ListIterator()
 		:_node(NULL)
 	{}
 	ListIterator(Node *node)
@@ -72,11 +73,11 @@ struct ListIterator
 		return temp;
 	}
 
-	bool operator==(const Self& it)
+	bool operator==(Self& it)
 	{
 		return _node == it._node;
 	}
-	bool operator!=(const Self& it)
+	bool operator!=(Self& it)
 	{
 		return _node != it._node;
 	}
@@ -92,12 +93,13 @@ class List
 
 public:
 	typedef ListIterator<T, T&, T*> Iterator;
-	//typedef ListIterator<const T, const T&, const T*> ConstIterator;
+	typedef ListIterator<T, const T&, const T*> ConstIterator;
 	/////////////////////////////////////
 public:
 	//construction
 	List()//无参
 	{
+		_size = 0;
 		_head = new Node(T());
 		_head->_next = _head;
 		_head->_prev = _head;
@@ -119,10 +121,8 @@ public:
 		_head = new Node(T());
 		_head->_next = _head;
 		_head->_prev = _head;
-		while (first != last){
+		for (; first != last; ++first)
 			PushBack(*first);
-			++first;
-		}
 	}
 	List( List<T>& l)//拷贝构造
 	{
@@ -131,10 +131,8 @@ public:
 		_head->_prev = _head;
 
 		List<T>::Iterator it = l.Begin();
-		while (it != l.End()){ 
+		for (; it != l.End(); ++it)
 			PushBack(*it);
-			++it;
-		}
 	}
 	/////////////////////////////////
 	//Iterator
@@ -142,48 +140,69 @@ public:
 	{
 		return _head->_next;
 	}
-	//ConstIterator CBegin()const
-	//{
-	//	return _head->_next;
-	//}
+	ConstIterator Begin()const
+	{
+		return _head->_next;
+	}
 
 	Iterator End()
 	{
 		return _head;
 	}
-	//ConstIterator CEnd()const
-	//{
-	//	return _head;
-	//}
+	ConstIterator End()const
+	{
+		return _head;
+	}
 	/////////////////////////////////////////
 	//modifiers
+	template<class InputIterator>
+	void Assign(InputIterator first, InputIterator last)//先清空链表在用first——last区间的值构造链表
+	{
+		Clear();
+		List(first, last);
+	}
+	void Assign(size_t n, const T& value)//先清空链表，用n个value填充链表
+	{
+		Clear();
+		List(n, value);
+	}
+	
+	//代码复用——>效率问题
 	void PushBack(const T& value)
 	{
-		Node *temp = new Node(value);
-
-		temp->_next = _head;
-		temp->_prev = _head->_prev;
-
-		_head->_prev->_next = temp;
-		_head->_prev = temp;
+		Insert(End(), value);
 	}
 	void PopBack()
-	{}
+	{
+		Erase(Iterator(_head->_prev));
+	}
+	void PushFront(const T& value)
+	{
+		Insert(Begin(), value);
+	}
+	void PopFront()
+	{
+		Erase(Begin());
+	}
 
+	//在position之前插入value
 	Iterator Insert(Iterator position, const T& value)
 	{
 		Node *cur = position._node;
-		Node *next = cur->_next;
-		Node *node = new Node(value);
+		Node *prev = cur->_prev;
+		Node *newNode = new Node(value);
 
-		cur->_next = node;
-		node->_prev = cur;
+		prev->_next = newNode;
+		newNode->_prev = prev;
 
-		node->_next = next;
-		next->_prev = node;
+		newNode->_next = cur;
+		cur->_prev = newNode;
 
-		return node;
+		++_size;
+
+		return newNode;
 	}
+
 
 	//迭代器失效？？？
 	Iterator Erase(Iterator& position)
@@ -197,95 +216,127 @@ public:
 		del->_next->_prev = prev;
 
 		delete del;
+		--_size;
+
 		position = prev;
 		return prev;
 	}
 
 	/////////////////////
 	//operations
+	//删掉所有value
 	void Remove(const T& value)
 	{
 		Iterator it = Begin();
-		while (it != End()){
-			if (*it == value){
-				Node* prev = it._node->_prev;
-
-				prev->_next = it._node->_next;
-				it._node->_next->_prev = prev;
-
-				delete it._node;
-				it = prev;
-			}
-			++it;
-		}
+		for (; it != End(); ++it)
+			if (*it == value)
+				Erase(it);
 	}
 
+	//去掉连续的重复的data
 	void Unique(const T& value)
 	{
 		Iterator it1 = Begin();
 		Iterator it2 = ++Begin();
-		while (it2 != End()){
-			if (it1._node->_data == it2._node->_data){
+		for (; it2 != End(); ++it2)
+			if (it1._node->_data == it2._node->_data)
 				Erase(it2);
-				++it2;
-			}
-			else{
+			else
 				++it1;
-				++it2;
-			}
-		}
 	}
 
+	//清空链表
+	void Clear()
+	{
+		while (_head != _head->_next)
+			PopFront();
+	}
+
+	size_t Size()
+	{
+		return _size;
+	}
 protected:
+	size_t _size;
 	Node *_head;
 };
 
+#endif
+
 #if TEST
 
-//？？？ConstIterator的问题？？？
-void PrintList( List<int>& l)
+void PrintList(const List<int>& l)
 {
-	List<int>::Iterator it1 = l.Begin();
-	while (it1 != l.End()){
+	List<int>::ConstIterator it1 = l.Begin();
+	for (; it1 != l.End(); ++it1)
 		cout << *it1 << ' ';
-		++it1;
-	}
 	cout << endl;
 }
+
 void TestList()
 {
 	List<int> l1;
 	l1.PushBack(1);
 	l1.PushBack(2);
 	l1.PushBack(3);
-	l1.PushBack(3);
-	l1.PushBack(3);
 	l1.PushBack(4);
-	l1.PushBack(3);
-	l1.PushBack(3);
-	l1.PushBack(3);
+	l1.PushFront(5);
+	l1.PushFront(6);
+	l1.PushFront(7);
+	l1.PushFront(8);
 	PrintList(l1);
 
-	//l1.Unique(3);
-	//l1.Remove(30);
-	List<int>::Iterator it1 = l1.Begin();
-	while (it1 != l1.End()){
-		if (*it1 % 2 == 0)
-			l1.Erase(it1);
-		++it1;
-	}
+	l1.PopBack();
+	l1.PopFront();
+
 	PrintList(l1);
 
-	List<int> l2(10, 5);
+	List<int> l2;
+	l2.Assign(++l1.Begin(), --l1.End());
 	PrintList(l2);
 
+	//l2.Assign(5, 10);
+	PrintList(l2);
+	
+	//l1.Clear();
+	//PrintList(l1);
 
-	List<int> l3(++l1.Begin(), l1.End());
-	l3.Insert(l3.Begin(), 10);
-	PrintList(l3);
+	//l1.PopBack();
+	//l1.PopBack();
+	//l1.PopBack();
+	//l1.PopBack();
+	//PrintList(l1);
 
-	List<int> l4(l3);
-	PrintList(l4);
+	//l1.PopFront();
+	//l1.PopFront();
+	//l1.PopFront();
+	//l1.PopFront();
+	//PrintList(l1);
+
+	//l1.PopFront();
+
+	//PrintList(l1);
+
+	////l1.Unique(3);
+	////l1.Remove(30);
+	//List<int>::Iterator it1 = l1.Begin();
+	//while (it1 != l1.End()){
+	//	if (*it1 % 2 == 0)
+	//		l1.Erase(it1);
+	//	++it1;
+	//}
+	//PrintList(l1);
+
+	//List<int> l2(10, 5);
+	//PrintList(l2);
+
+
+	//List<int> l3(++l1.Begin(), l1.End());
+//	l3.Insert(l3.Begin(), 10);
+	//PrintList(l3);
+
+	//List<int> l4(l3);
+	//PrintList(l4);
 
 }
 
@@ -303,9 +354,14 @@ void test_list()
 		cout << *it << ' ';
 		++it;
 	}
+
+	list<int> l2;
+	l2.push_back(5);
+	l2.push_back(6);
+	l2.push_back(7);
+	l2.push_back(8);
+
+	l2.assign(++l.begin(), --l.end());
 }
-#endif
 
 #endif
-
-
