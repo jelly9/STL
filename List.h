@@ -1,7 +1,7 @@
 #ifndef __LIST_H__
 #define __LIST_H__
 
-#define TEST 1
+#define TEST 0
 
 #include <iostream>
 using namespace std;
@@ -89,10 +89,11 @@ struct ListIterator
 template<class T>
 class List
 {
-	typedef ListNode<T> Node;
-
+	typedef ListNode<T>		Node;
+	typedef T&				Ref;
+	typedef const T&		ConstRef;
 public:
-	typedef ListIterator<T, T&, T*> Iterator;
+	typedef ListIterator<T, T&, T*>				Iterator;
 	typedef ListIterator<T, const T&, const T*> ConstIterator;
 	/////////////////////////////////////
 public:
@@ -134,15 +135,37 @@ public:
 		for (; it != l.End(); ++it)
 			PushBack(*it);
 	}
+
+	////////////////////////////////
+	Ref Back()
+	{
+		return *(--End());
+	}
+
+	ConstRef Back()const
+	{
+		return *(--End());
+	}
+
+	Ref Front()
+	{
+		return *Begin();
+	}
+
+	ConstRef Front()const
+	{
+		return *Begin();
+	}
+
 	/////////////////////////////////
 	//Iterator
-	Iterator Begin()
+	Iterator Begin()//(link_type)((*node).next);
 	{
-		return _head->_next;
+		return (Node*)(*_head)._next;
 	}
 	ConstIterator Begin()const
 	{
-		return _head->_next;
+		return (Node*)(*_head)._next;
 	}
 
 	Iterator End()
@@ -256,6 +279,11 @@ public:
 	{
 		return _size;
 	}
+
+	bool Empty()
+	{
+		return Begin() == End();
+	}
 protected:
 	size_t _size;
 	Node *_head;
@@ -284,19 +312,23 @@ void TestList()
 	l1.PushFront(6);
 	l1.PushFront(7);
 	l1.PushFront(8);
-	PrintList(l1);
+	
+	cout << l1.Back() << endl;
+	cout << l1.Front() << endl;
+	
+	//PrintList(l1);
 
-	l1.PopBack();
-	l1.PopFront();
+	//l1.PopBack();
+	//l1.PopFront();
 
-	PrintList(l1);
+	//PrintList(l1);
 
-	List<int> l2;
-	l2.Assign(++l1.Begin(), --l1.End());
-	PrintList(l2);
+	//List<int> l2;
+	//l2.Assign(++l1.Begin(), --l1.End());
+	//PrintList(l2);
 
 	//l2.Assign(5, 10);
-	PrintList(l2);
+//	PrintList(l2);
 	
 	//l1.Clear();
 	//PrintList(l1);
@@ -347,21 +379,41 @@ void test_list()
 	l.push_back(1);
 	l.push_back(2);
 	l.push_back(3);
+	l.push_back(3);
+	l.push_back(3);
+	l.push_back(4);
+	l.push_back(4);
+	l.push_back(4);
 	l.push_back(4);
 
-	list<int>::const_iterator it = l.cbegin();
+	list<int>::iterator it = l.begin();
+	while (it != l.end()){
+		cout << *it << ' ';
+		++it;
+	}cout << endl;
+
+	l.unique();
+
+	it = l.begin();
 	while (it != l.end()){
 		cout << *it << ' ';
 		++it;
 	}
 
-	list<int> l2;
-	l2.push_back(5);
-	l2.push_back(6);
-	l2.push_back(7);
-	l2.push_back(8);
+	//list<int> l2;
+	//l2.push_back(1);
+	//l2.push_back(2);
+	//l2.push_back(3);
+	//l2.push_back(4);
 
-	l2.assign(++l.begin(), --l.end());
+	//l2.insert(++l2.begin(), ++l.begin(), --l.end());
+
+
+	//list<int>::iterator it = l2.begin();
+	//while (it != l2.end()){
+	//	cout << *it << ' ';
+	//	++it;
+	//}
 }
 
 #endif
