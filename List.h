@@ -1,7 +1,7 @@
 #ifndef __LIST_H__
 #define __LIST_H__
 
-#define TEST 0
+#define TEST 1
 
 #include <iostream>
 using namespace std;
@@ -89,10 +89,10 @@ struct ListIterator
 template<class T>
 class List
 {
+public:
 	typedef ListNode<T>		Node;
 	typedef T&				Ref;
 	typedef const T&		ConstRef;
-public:
 	typedef ListIterator<T, T&, T*>				Iterator;
 	typedef ListIterator<T, const T&, const T*> ConstIterator;
 	/////////////////////////////////////

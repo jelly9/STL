@@ -1,16 +1,16 @@
 #ifndef __MY_QUEUE_H__
 #define __MY_QUEUE_H__
 
-#define TESTQUEUE 0
+#define TESTQUEUE 1
 
 #include "STL\List.h"
 
-template<class T, class Container = List<T>>
+template<class T, class Sequence = List<T>>
 class Queue
 {
 private:
-	typedef T&			Ref;
-	typedef const T&	ConstRef;
+	typedef typename Sequence::Ref			Ref;
+	typedef typename Sequence::ConstRef		ConstRef;
 public:
 	void Push(const T& value)
 	{
@@ -52,7 +52,7 @@ public:
 	}
 
 protected:
-	Container _q;
+	Sequence _q;
 };
 
 

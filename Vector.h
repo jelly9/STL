@@ -21,12 +21,13 @@ using namespace std;
 template<typename T>
 class Vector
 {
-private:
+public:
 	typedef T&			Ref;
 	typedef const T&	ConstRef;
+
 	typedef T*			Ptr;
 	typedef const T*	ConstPtr;
-public:
+
 	typedef T*			Iterator;
 	typedef const T*	ConstIterator;
 public:

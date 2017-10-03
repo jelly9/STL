@@ -8,8 +8,6 @@ using namespace std;
 
 struct Pos
 {
-	Pos()
-	{}
 	Pos(int x, int y):_row(x),_col(y){}
 	int _row;
 	int _col;
@@ -195,7 +193,13 @@ public:
 
 ///////////////////////////////////
 //使用两个栈保存路径，求得最短路径
-	void GetShortPath(Pos& entry, stack<Pos>& shortPath, stack<Pos>& path, int cur = 2)
+	void GetShortPath(Pos& entry, stack<Pos>& shortPath, stack<Pos>& path)
+	{
+		_GetShortPath(entry, shortPath, path, 2);
+	}
+
+protected:
+	void _GetShortPath(Pos& entry, stack<Pos>& shortPath, stack<Pos>& path, int cur)
 	{
 		_map[entry._row][entry._col] = cur;
 		path.push(entry);
@@ -213,14 +217,14 @@ public:
 		Pos next = entry;
 		next._row -= 1;
 		if (_IsAccess(next, entry)){
-			GetShortPath(next, shortPath, path, cur+1);
+			_GetShortPath(next, shortPath, path, cur+1);
 		}
 
 		//右
 		next = entry;
 		next._col += 1;
 		if (_IsAccess(next, entry)){
-			GetShortPath(next, shortPath, path, cur+1);
+			_GetShortPath(next, shortPath, path, cur+1);
 		}
 
 
@@ -228,14 +232,14 @@ public:
 		next = entry;
 		next._row += 1;
 		if (_IsAccess(next, entry)){
-			GetShortPath(next, shortPath, path, cur+1);
+			_GetShortPath(next, shortPath, path, cur+1);
 		}
 
 		//左
 		next = entry;
 		next._col -= 1;
 		if (_IsAccess(next, entry)){
-			GetShortPath(next, shortPath, path, cur+1);
+			_GetShortPath(next, shortPath, path, cur+1);
 		}
 		
 		path.pop();
@@ -295,32 +299,32 @@ private:
 
 void TestMaze()
 {
-	//int arr[10][10] =
-	//{
-	//	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-	//	{ 1, 0, 0, 0, 0, 0, 0, 1, 1, 1 },
-	//	{ 0, 0, 0, 0, 0, 1, 0, 0, 1, 1 },
-	//	{ 1, 1, 0, 1, 0, 1, 1, 0, 1, 1 },
-	//	{ 1, 1, 0, 1, 0, 0, 1, 0, 1, 1 },
-	//	{ 1, 1, 0, 1, 1, 0, 0, 0, 1, 1 },
-	//	{ 1, 1, 0, 1, 1, 0, 1, 1, 1, 1 },
-	//	{ 1, 1, 0, 1, 1, 0, 1, 0, 1, 1 },
-	//	{ 1, 1, 0, 0, 0, 0, 0, 0, 1, 1 },
-	//	{ 1, 1, 1, 0, 1, 1, 1, 1, 1, 1 },
-	//};
 	int arr[10][10] =
 	{
 		{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-		{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-		{ 0, 0, 1, 1, 1, 1, 1, 1, 1, 1 },
-		{ 1, 0, 1, 1, 1, 1, 1, 1, 1, 1 },
-		{ 1, 0, 0, 0, 0, 0, 0, 0, 1, 1 },
-		{ 1, 0, 1, 1, 1, 1, 1, 0, 1, 1 },
-		{ 1, 0, 1, 1, 1, 1, 1, 0, 1, 1 },
-		{ 1, 0, 1, 1, 1, 1, 1, 0, 1, 1 },
-		{ 1, 0, 1, 1, 1, 1, 1, 0, 1, 1 },
-		{ 1, 0, 1, 1, 1, 1, 1, 0, 1, 1 },
+		{ 1, 0, 0, 0, 0, 0, 0, 1, 1, 1 },
+		{ 0, 0, 0, 0, 0, 1, 0, 0, 1, 1 },
+		{ 1, 1, 0, 1, 0, 1, 1, 0, 1, 1 },
+		{ 1, 1, 0, 1, 0, 0, 1, 0, 1, 1 },
+		{ 1, 1, 0, 1, 1, 0, 0, 0, 1, 1 },
+		{ 1, 1, 0, 1, 1, 0, 1, 1, 1, 1 },
+		{ 1, 1, 0, 1, 1, 0, 1, 0, 1, 1 },
+		{ 1, 1, 0, 0, 0, 0, 0, 0, 1, 1 },
+		{ 1, 1, 1, 0, 1, 1, 1, 1, 1, 1 },
 	};
+	//int arr[10][10] =
+	//{
+	//	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+	//	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+	//	{ 0, 0, 1, 1, 1, 1, 1, 1, 1, 1 },
+	//	{ 1, 0, 1, 1, 1, 1, 1, 1, 1, 1 },
+	//	{ 1, 0, 0, 0, 0, 0, 0, 0, 1, 1 },
+	//	{ 1, 0, 1, 1, 1, 1, 1, 0, 1, 1 },
+	//	{ 1, 0, 1, 1, 1, 1, 1, 0, 1, 1 },
+	//	{ 1, 0, 1, 1, 1, 1, 1, 0, 1, 1 },
+	//	{ 1, 0, 1, 1, 1, 1, 1, 0, 1, 1 },
+	//	{ 1, 0, 1, 1, 1, 1, 1, 0, 1, 1 },
+	//};
 
 	Maze<10, 10> m(arr);
 	stack<Pos> shortPath;

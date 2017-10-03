@@ -1,15 +1,17 @@
 #ifndef __MY_STACK_H__
 #define __MY_STACK_H__
 
+#define TESTSTACK 0
+
 #include "STL\Vector.h"
 
 //栈——不提供迭代器
-template<class T, class Squeue = Vector<T>>
+template<class T, class Sequence = Vector<T>>
 class Stack
 {
 private:
-	typedef T&			Ref;
-	typedef const T&	ConstRef;
+	typedef typename Sequence::Ref			Ref;
+	typedef typename Sequence::ConstRef		ConstRef;
 public:
 	void Push(const T& value)
 	{
@@ -39,14 +41,13 @@ public:
 		return _s.Size();
 	}
 protected:
-	Squeue _s;
+	Sequence _s;
 };
 
 
 
 #endif
 
-#define TESTSTACK 1
 #if TESTSTACK
 #include "STL\List.h"
 
@@ -77,5 +78,18 @@ void TestStack()
 	s1.Pop();
 	cout << s1.Top() << endl;
 
+}
+
+#include <stack>
+#include <vector>
+
+void test_stack()
+{
+	stack<int, list<int>> s;
+
+	s.push(1);
+	s.push(2);
+	s.push(3);
+	s.push(4);
 }
 #endif
