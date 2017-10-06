@@ -72,7 +72,7 @@ protected:
 	//向下调整
 	void _AdjustDown(int parent)
 	{
-		int child = parent * 2 + 1;
+		size_t child = parent * 2 + 1;
 
 		while (child < _a.size()){
 			if (child + 1 < _a.size() && Com()(_a[child + 1], _a[child]))
@@ -110,7 +110,7 @@ protected:
 void TestHeap()
 {
 	int a[] = {1, 4, 6, 2, 8, 43, 30, 28};
-	Heap<int> h(a, sizeof(a)/sizeof(a[0]), -1);
+	Heap<int, Greater<int>> h(a, sizeof(a)/sizeof(a[0]), -1);
 	cout << h.Top() << endl;;
 	h.Push(3);
 	cout << h.Top() << endl;;
@@ -120,7 +120,7 @@ void TestHeap()
 
 //求最大的K个用小堆
 //求最小的K个用大堆
-void TopK(const vector<int>& a, int K)
+void TopK(const vector<int>& a, size_t K)
 {
 
 	assert(a.size() > K);
@@ -160,11 +160,11 @@ void TestTopK()
 }
 
 //堆排序
-vector<int> HeapSort(int *a, size_t size)
+vector<int> HeapSort(int *a, int size)
 {
 	vector<int> v;
 	v.resize(size);
-	for (size_t i = 0; i < size; ++i)
+	for (int i = 0; i < size; ++i)
 		v[i] = a[i];
 
 	//建堆
