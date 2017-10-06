@@ -4,21 +4,18 @@
 
 #ifndef __VECTOR_H__
 #define __VECTOR_H__
-#define TEST 0
+#define TESTVECTOR 1
 
-#ifndef __IOSTREAM__
-#define __IOSTREAM__
-#include <iostream>
-#endif
-
-using namespace std;
-
-#ifndef __ASSERT__
-#define __ASSERT__
+#ifndef __INCLUDE_ASSERT__
+#define __INCLUDE_ASSERT__
 #include <assert.h>
 #endif
 
-template<typename T>
+#ifndef NULL
+#define NULL 0
+#endif
+
+template<class T>
 class Vector
 {
 public:
@@ -30,6 +27,10 @@ public:
 
 	typedef T*			Iterator;
 	typedef const T*	ConstIterator;
+
+public:
+	Ref operator=(ConstRef v);
+	Vector(ConstRef v);
 public:
 	/////////////////////////////////////
 	//construct
@@ -41,7 +42,6 @@ public:
 	//用大小为n的数组构造Vector
 	Vector(const T *a, size_t n)
 	{
-		//_RangeFillInitialize(&a, (&a)+n);
 		_start = new T[n];
 
 		for (size_t i = 0; i < n; ++i)
@@ -50,21 +50,18 @@ public:
 		_finish = _start + n;
 		_endOfStorage = _finish;
 	}
-	//用n个value构造Vector
-	Vector(size_t n, const T& value)
+	Vector(const Vector<T>& v)
 	{
-		_FillInitialize(n, value);
+		size_t size = v.Size();
+		size_t capacity = v.Capacity();
+		_Expand(capacity);
+		for (size_t i = 0; i < size; ++i)
+			_start[i] = v[i];
+
+		_finish = _start + size;
+		_endOfStorage = _start + capacity;
+		
 	}
-	//构造大小为n的Vector
-	Vector(size_t n)
-	{
-		_FillInitialize(n, T());
-	}
-	//用first ——last区间的值构造Vector
-	//Vector(Iterator first, Iterator last)
-	//{
-	//	_RangeFillInitialize(first, last);
-	//}
 
 	Ref operator[](size_t n)
 	{
@@ -114,6 +111,48 @@ public:
 	ConstIterator End()const
 	{
 		return _finish;
+	}
+
+	////////////////////////////////////
+	//vector<T, Alloc>& vector<T, Alloc>::operator=(const vector<T, Alloc>& x) {
+	//	if (&x != this) {
+	//		if (x.size() > capacity()) {
+	//			iterator tmp = allocate_and_copy(x.end() - x.begin(),
+	//				x.begin(), x.end());
+	//			destroy(start, finish);
+	//			deallocate();
+	//			start = tmp;
+	//			end_of_storage = start + (x.end() - x.begin());
+	//		}
+	//		else if (size() >= x.size()) {
+	//			iterator i = copy(x.begin(), x.end(), begin());
+	//			destroy(i, finish);
+	//		}
+	//		else {
+	//			copy(x.begin(), x.begin() + size(), start);
+	//			uninitialized_copy(x.begin() + size(), x.end(), finish);
+	//		}
+	//		finish = start + x.size();
+	//	}
+	//	return *this;
+	//}
+	bool operator==(const Vector<T>& v)
+	{
+		return _start == v._start && _finish == v._finish && _endOfStorage == v._endOfStorage;
+	}
+
+	bool operator!=(const Vector<T>& v)
+	{
+		return _start != v._start && _finish != v._finish && _endOfStorage != v._endOfStorage;
+	}
+
+	Vector<T>& operator=(const Vector<T>& v)
+	{
+		if (this != &v){
+			_Destroy();
+			Vector(v);
+		}
+		return *this;
 	}
 	////////////////////////////////////
 	//capacity
@@ -190,7 +229,8 @@ protected:
 			for (size_t i = 0; i < size; ++i)
 				temp[i] = _start[i];
 
-			delete _start;
+			if(NULL != _start)
+				delete[] _start;
 
 			_start = temp;
 			_finish = _start + size;
@@ -204,24 +244,8 @@ protected:
 			_start = _finish = _endOfStorage = NULL;
 		}
 	}
-	//开辟大小为n的空间，并用value初始化之
-	void _FillInitialize(size_t n, const T& value)
-	{
-		_start = new T[n];
-		for (size_t i = 0; i < n; ++i)
-			_start[i] = value;
 
-		_finish = _start + n;
-		_endOfStorage = _finish;
-	}
 
-	void _RangeFillInitialize(Iterator first, Iterator last)
-	{
-		size_t size = last - first;
-		_start = new T[size];
-		for (size_t i = 0; i < size; ++i, ++first)
-			_start[i] = *first;
-	}
 protected:
 	Iterator _start;
 	Iterator _finish;
@@ -232,7 +256,9 @@ protected:
 
 #endif
 
-#if TEST
+#if TESTVECTOR
+#include <iostream>
+using namespace std;
 #include <vector>
 void PrintVector(const Vector<int>& V)
 {
@@ -246,19 +272,24 @@ void PrintVector(const Vector<int>& V)
 
 void TestVector()
 {
-	Vector<int> v;
+	Vector<string> v;
 	//v.Resize(5, 10);
 	//v.Resize(10, 20);
-	v.PushBack(1);
-	v.PushBack(2);
-	v.PushBack(2);
-	v.PushBack(2);
-	v.PushBack(2);
-	v.PushBack(3);
-	v.PushBack(4);
+	v.PushBack("1111");
+	v.PushBack("2222");
+	v.PushBack("3333");
+	v.PushBack("4444");
 
-	cout << v.Back() << endl;
-	cout << v.Front() << endl;
+
+	Vector<string> v2(v);
+	
+	v[0] = v2[3];
+
+
+	//cout << v.Back() << endl;
+	//cout << v.Front() << endl;
+	
+	
 	//v.PushBack(2);
 	//v.PushBack(2);
 	//v.PushBack(2);
@@ -319,18 +350,24 @@ void PrintVector(const vector<int>& v)
 
 void test_list()
 {
-	int a[4] = {1, 2, 3, 4};
-	cout << *(a + 0) << ' ';
-	cout << *(a + 1) << ' ';
-	cout << *(a + 2) << ' ';
-	cout << *(a + 3) << ' ' << endl;;
+	//vector<int> v;
+	//v.push_back(1);
+	//v.push_back(2);
+	//v.push_back(3);
+	//v.push_back(4);
 
-	vector<int> v;
-	v.push_back(1);
-	v.push_back(2);
-	v.push_back(3);
-	v.push_back(4);
+	//vector<int> v2(v);
 	//cout << *(v + 1) << ' ';
+
+	vector<string> v;
+	v.push_back("1111");
+	v.push_back("2222");
+	v.push_back("3333");
+	v.push_back("4444");
+
+	vector<string> v2(v);
+
+	v[2] = v2[1];
  }
 
 #endif

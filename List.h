@@ -1,13 +1,12 @@
 #ifndef __LIST_H__
 #define __LIST_H__
 
-#define TEST 1
+#define TESTLIST 0
 
-#include <iostream>
-using namespace std;
-
+#ifndef ASSERT
+#define ASSERT
 #include<assert.h>
-
+#endif
 //list½Úµã
 template<class T>
 struct ListNode
@@ -291,8 +290,9 @@ protected:
 
 #endif
 
-#if TEST
-
+#if TESTLIST
+#include <iostream>
+using namespace std;
 void PrintList(const List<int>& l)
 {
 	List<int>::ConstIterator it1 = l.Begin();

@@ -4,10 +4,12 @@
 #include <iostream>
 using namespace std;
 
+//#include "D:\Github\STL\stack.h"
 #include <stack>
 
 struct Pos
 {
+	Pos(){}
 	Pos(int x, int y):_row(x),_col(y){}
 	int _row;
 	int _col;
@@ -45,18 +47,18 @@ public:
 		_map[entry._row][entry._col] = 2;
 		path.push(entry);
 		
-		Pos next = path.top();
+		Pos next = path.Top();
 
 		//将走过的点保存在栈中
 		while (!path.empty())
 		{
-			if (_IsOut(path.top())){
-				cout << "出口:" << '(' << path.top()._row << ',' << path.top()._col << ')' << endl;
+			if (_IsOut(path.Top())){
+				cout << "出口:" << '(' << path.Top()._row << ',' << path.Top()._col << ')' << endl;
 				break;
 			}
 
 			//上
-			next = path.top();
+			next = path.Top();
 			next._row -= 1;
 			if (_IsAccess(next)){
 				_map[next._row][next._col] = 2;
@@ -64,7 +66,7 @@ public:
 				continue;
 			}
 			//右
-			next = path.top();
+			next = path.Top();
 			next._col += 1;
 			if (_IsAccess(next)){
 				_map[next._row][next._col] = 2;
@@ -73,7 +75,7 @@ public:
 			}
 
 			//左
-			next = path.top();
+			next = path.Top();
 			next._col -= 1;
 			if (_IsAccess(next)){
 				_map[next._row][next._col] = 2;
@@ -82,7 +84,7 @@ public:
 			}
 
 			//下
-			next = path.top();
+			next = path.Top();
 			next._row += 1;
 			if (_IsAccess(next)){
 				_map[next._row][next._col] = 2;
@@ -302,13 +304,13 @@ void TestMaze()
 	int arr[10][10] =
 	{
 		{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-		{ 1, 0, 0, 0, 0, 0, 0, 1, 1, 1 },
+		{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
 		{ 0, 0, 0, 0, 0, 1, 0, 0, 1, 1 },
-		{ 1, 1, 0, 1, 0, 1, 1, 0, 1, 1 },
-		{ 1, 1, 0, 1, 0, 0, 1, 0, 1, 1 },
-		{ 1, 1, 0, 1, 1, 0, 0, 0, 1, 1 },
-		{ 1, 1, 0, 1, 1, 0, 1, 1, 1, 1 },
-		{ 1, 1, 0, 1, 1, 0, 1, 0, 1, 1 },
+		{ 1, 1, 0, 1, 1, 1, 1, 0, 1, 1 },
+		{ 1, 1, 0, 1, 1, 1, 1, 0, 1, 1 },
+		{ 1, 1, 0, 1, 1, 1, 1, 0, 1, 1 },
+		{ 1, 1, 0, 1, 1, 1, 1, 0, 1, 1 },
+		{ 1, 1, 0, 1, 1, 1, 1, 0, 1, 1 },
 		{ 1, 1, 0, 0, 0, 0, 0, 0, 1, 1 },
 		{ 1, 1, 1, 0, 1, 1, 1, 1, 1, 1 },
 	};
@@ -332,7 +334,7 @@ void TestMaze()
 
 	m.Show();
 	m.GetShortPath(Pos(2,0), shortPath, path);
-	cout << shortPath.size() << endl;
+	std::cout << shortPath.size() << endl;
 	//m.GetPath(Pos(2,0));
 	//m.GetPath_R(Pos(2,0));
 	//cout <<"最短路径的长度：" << m.GetShortPath(Pos(2, 0)) << endl;
