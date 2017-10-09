@@ -15,9 +15,10 @@ struct HuffmanTreeNode
 		:_w(w)
 		, _left(NULL)
 		, _right(NULL)
+		,_parent(NULL)
 	{}
 
-	Self operator + (Self& h)const
+	Self operator + (const Self& h)const
 	{
 		Self temp;
 		temp._w = _w + h._w;
@@ -35,6 +36,7 @@ struct HuffmanTreeNode
 	W _w;
 	HuffmanTreeNode* _left;
 	HuffmanTreeNode* _right;
+	HuffmanTreeNode* _parent;
 };
 template<class W>
 class HuffmanTree
@@ -43,13 +45,13 @@ class HuffmanTree
 public:
 	HuffmanTree(const W *arr, size_t size, const W& invalue)
 	{
-		struct NodePtrCom{
+		struct NodePtrCom{//定制霍夫曼树节点比较器
 			bool operator()(const Node* l, const Node* r){
 				return l->_w < r->_w;
 			}
 		};
 
-		Heap<Node*, NodePtrCom> h;
+		Heap<Node*, NodePtrCom> h;//借助堆构建霍夫曼树
 		for (size_t i = 0; i < size; ++i){
 			if (arr[i] != invalue)
 				h.Push(new Node(arr[i]));
@@ -61,15 +63,39 @@ public:
 			Node *right = h.Top();
 			h.Pop();
 
-			Node *parent = new Node(left->_w + right->_w);
+			Node *parent = new Node(left->_w + right->_w);//用最小的两个节点构建父节点
 			parent->_left = left;
 			parent->_right = right;
+			left->_parent = parent;
+			right->_parent = parent;
 
 			h.Push(parent);
 		}
 		_root = h.Top();
 	}
 
+	Node* GetRoot()
+	{
+		return _root;
+	}
+	~HuffmanTree()
+	{
+		_Destroy(_root);
+	}
+protected:
+	HuffmanTree(const HuffmanTree<W>& h);
+	HuffmanTree<W> operator =(const HuffmanTree<W>& h);
+protected:
+	void _Destroy(Node *root)
+	{
+		if (NULL == root)
+			return;
+		_Destroy(root->_left);
+		_Destroy(root->_right);
+
+		delete root;
+		root = NULL;
+	}
 protected:
 	Node *_root;
 };
