@@ -6,6 +6,11 @@
 #ifndef ASSERT
 #define ASSERT
 #include<assert.h>
+
+#ifndef NULL
+	#define NULL 0
+#endif
+
 #endif
 //list½Úµã
 template<class T>

@@ -60,6 +60,9 @@ protected:
 
 #if TESTQUEUE
 
+#include <iostream>
+using namespace std;
+
 void TestQueue()
 {
 	Queue<int> q;
@@ -77,6 +80,35 @@ void TestQueue()
 	cout << q.Back() << endl;//4
 
 
+}
+
+#include <queue>
+#include <list>
+#include <vector>
+
+void test_queue()
+{
+	queue<int, list<int>> q;
+	q.push(1);
+	q.push(2);
+	q.push(3);
+	q.push(4);
+	cout << q.front() << endl;
+	cout << q.back() << endl << endl;
+
+	q.pop();
+	cout << q.front() << endl;
+	cout << q.back() << endl << endl;
+
+	q.pop();
+	cout << q.front() << endl;
+	cout << q.back() << endl << endl;
+
+	q.pop();
+	cout << q.front() << endl;
+	cout << q.back() << endl << endl;
+
+	q.pop();
 }
 
 #endif

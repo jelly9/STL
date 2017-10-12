@@ -57,17 +57,25 @@ void TestStack()
 	Stack<BB> s1;
 }
 
-//#include <stack>
-//#include <vector>
-//#include <list>
-//
-//void test_stack()
-//{
-//	stack<int> s;
-//
-//	s.push(1);
-//	s.push(2);
-//	s.push(3);
-//	s.push(4);
-//}
+#include <stack>
+#include <vector>
+#include <list>
+
+void test_stack()
+{
+	stack<int, vector<int>> s1;
+	s1.push(11);
+	cout << s1.top() << endl;
+
+	s1.push(12);
+	cout << s1.top() << endl;
+
+	stack<int, list<int>> s2;
+	s2.push(21);
+	cout << s2.top() << endl;
+	
+	s2.push(22);
+	cout << s2.top() << endl;
+
+}
 #endif
