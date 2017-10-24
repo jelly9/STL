@@ -8,8 +8,10 @@ using namespace std;
 template<class T, size_t BuffSize>
 class DequeIterator
 {
-	typedef DequeIterator<T, BuffSize> Self;
-	typedef T** MapPointer;
+protected:
+	typedef DequeIterator<T, BuffSize>		Self;
+	typedef T**							MapPointer;
+
 public:
 	//构造函数
 	DequeIterator()
@@ -19,19 +21,19 @@ public:
 	,_node(NULL)
 	{}
 
-	//DequeIterator(T* cur, MapPointer node)
-	//	:_cur(cur)
-	//	,_first(*node)
-	//	,_last(_first + BuffSize)
-	//	,_node(node)
-	//{}
-	//
-	//DequeIterator(const Self& s)
-	//	:_cur(s._cur)
-	//	,_first(s._first)
-	//	,_last(s._last)
-	//	,_node(s._node)
-	//{}
+	DequeIterator(T* cur, MapPointer node)
+		:_cur(cur)
+		,_first(*node)
+		,_last(_first + BuffSize)
+		,_node(node)
+	{}
+	
+	DequeIterator(const Self& s)
+		:_cur(s._cur)
+		,_first(s._first)
+		,_last(s._last)
+		,_node(s._node)
+	{}
 
 	//自增增减
 	Self& operator++()
@@ -120,7 +122,9 @@ class Deque
 {
 	typedef T** MapPointer;
 public:
-	typedef DequeIterator<T, BuffSize> Iterator;
+	typedef DequeIterator<T, BuffSize>		Iterator;
+	typedef T&							Ref;
+	typedef const T&						ConstRef;
 public:
 	Deque()
 		:_map(NULL)
@@ -157,12 +161,22 @@ public:
 	void PopBack()
 	{
 		--_finish;
+		if (_finish._cur == _finish._last)
+			delete[] *(_finish._node - 1);
+
+		if (_finish == _start)
+			delete[] _map;
 		--_size;
 	}
 
 	void PopFront()
 	{
 		++_start;
+		if (_start._cur == _start._first)
+			delete[] *(_start._node - 1);
+
+		if (_finish == _start)
+			delete _map;
 		--_size;
 	}
 
@@ -186,8 +200,37 @@ public:
 		return _start == _finish;
 	}
 
+	Ref Back()
+	{
+		assert(0 != _size);
+		if (_finish._cur != _finish._first)
+			return *(_finish._cur - 1);
+		else{
+			Iterator it(_finish);
+			--it;
+			return *(it._cur);
+		}
+	}
+
+	Ref Front()
+	{
+		assert(0 != _size);
+		return *(_start._cur);
+	}
 	~Deque()//释放空间
-	{}
+	{
+		if (_map){
+			T** cur = _start._node;
+			for (; cur != _finish._node; ++cur){
+				delete[] *cur;
+				*cur = NULL;
+			}
+			delete[] *cur;
+			*cur = NULL;
+			delete[] _map;
+			_map = NULL;
+		}
+	}
 
 protected:
 	void _PushBackAux(const T& value)
@@ -287,20 +330,35 @@ protected:
 	size_t _mapSize;
 	size_t _size;
 };
-
+#if 1
 void TestDeque()
 {
 	Deque<int, 3> d;
 	d.PushBack(1);
 	d.PushBack(2);
 	d.PushBack(3);
+
+	int i = d.Front();
+	cout << i << ' ';
+	i = d.Back();
+	cout << i << endl;
+
 	d.PushBack(4);
 	d.PushBack(5);
 	d.PushFront(6);
+	i = d.Front();
+	cout << i << ' ';
+	i = d.Back();
+	cout << i << endl;
+
 	d.PushFront(7);
 	d.PushFront(8);
 	d.PushFront(9);
 	d.PushFront(10);
+	i = d.Front();
+	cout << i << ' ';
+	i = d.Back();
+	cout << i << endl;
 
 	Deque<int, 3>::Iterator it = d.Begin();
 	while (it != d.End()){
@@ -309,8 +367,13 @@ void TestDeque()
 	}
 	cout << endl;
 
+
 	d.PopBack();
 	d.PopBack();
+	i = d.Front();
+	cout << i << ' ';
+	i = d.Back();
+	cout << i << endl;
 	it = d.Begin();
 	while (it != d.End()){
 		cout << *it << ' ';
@@ -320,12 +383,21 @@ void TestDeque()
 
 	d.PopFront();
 	d.PopFront();
+	i = d.Front();
+	cout << i << ' ';
+	i = d.Back();
+	cout << i << endl;
 	it = d.Begin();
 	while (it != d.End()){
 		cout << *it << ' ';
 		++it;
 	}
 	cout << endl;
+	i = d.Front();
+	cout << i << ' ';
+	i = d.Back();
+	cout << i << endl;
+
 }
 
 #include <deque>
@@ -351,6 +423,6 @@ void test_deque()
 	cout << endl;
 
 }
-
+#endif
 
 #endif

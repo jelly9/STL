@@ -3,11 +3,11 @@
 
 #define TESTSTACK 1
 
-#include "D:\Github\STL\Vector.h"
+#include "D:\Github\STL\Deque.h"
 
 
 //栈——不提供迭代器
-template<class T, class Sequence = Vector<T>>
+template<class T, class Sequence = Deque<T>>
 class Stack
 {
 private:
@@ -51,10 +51,34 @@ public:
 class BB{
 	AA a;
 };
-
+#if 1
 void TestStack()
 {
-	Stack<BB> s1;
+	Stack<int> s1;
+	s1.Push(11);
+	cout << s1.Top() << endl;
+
+	s1.Push(12);
+	cout << s1.Top() << endl;
+
+	s1.Push(21);
+	cout << s1.Top() << endl;
+
+	s1.Push(22);
+	cout << s1.Top() << endl;
+
+	cout << s1.Top() << endl;
+	s1.Pop();
+	cout << s1.Top() << endl;
+
+	s1.Pop();
+	cout << s1.Top() << endl;
+
+	s1.Pop();
+	cout << s1.Top() << endl;
+
+	s1.Pop();
+
 }
 
 #include <stack>
@@ -63,7 +87,7 @@ void TestStack()
 
 void test_stack()
 {
-	stack<int, vector<int>> s1;
+	stack<int> s1;
 	s1.push(11);
 	cout << s1.top() << endl;
 
@@ -78,4 +102,6 @@ void test_stack()
 	cout << s2.top() << endl;
 
 }
+
+#endif
 #endif
