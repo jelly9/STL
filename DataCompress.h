@@ -1,16 +1,16 @@
-//霍夫曼文件压缩算法
+//霍夫曼数据压缩算法
 #define _CRT_SECURE_NO_WARNINGS
 
-#ifndef __MY_FILE_COMPRESS_H__
-#define __MY_FILE_COMPRESS_H__
+#ifndef __MY_DATA_COMPRESS_H__
+#define __MY_DATA_COMPRESS_H__
 
 #include <algorithm>
 #include <string>
 
 #include "D:\Github\STL\HuffmanTree.h"
 
-const int CHARSIZE = 256;
-const int BUFFSIZE = 1024;
+#define CHARSIZE 256
+#define BUFFSIZE 1024
 
 struct CharInfor
 {
@@ -35,13 +35,13 @@ struct CharInfor
 	}
 };
 
-class FileCompress
+class DataCompress
 {
-private:
 	typedef HuffmanTreeNode<CharInfor> Node;
-	class FilePtr{//智能指针
+	//智能文件指针，自动关闭文件
+	class FilePtr{
 		FilePtr(const FilePtr&);
-		FilePtr operator=(const FilePtr&);
+		FilePtr operator=(const FilePtr&)const;
 	public:
 		FilePtr(FILE* p){
 			assert(p);
@@ -52,14 +52,15 @@ private:
 		}
 		FILE* _p;
 	};
+	//配置信息的结构体
 	struct ConfigInfor{
 		char _ch;
 		long long _count;
 	};
 public:
-	FileCompress()
+	DataCompress()
 	{
-		for (size_t i = 0; i < CHARSIZE; ++i){
+		for (int i = 0; i < CHARSIZE; ++i){
 			_infor[i]._ch = i;
 			_infor[i]._count = 0;
 		}
@@ -70,12 +71,10 @@ public:
 		FilePtr _fpOut(fopen(fileName, "rb"));
 		FILE* fpOut = _fpOut._p;
 		//1. 统计字符个数
-		char ch;
-		while (1){//ch != EOF
-			ch = getc(fpOut);
-			if(feof(fpOut))
-				break;
+		char ch = fgetc(fpOut);
+		while (!feof(fpOut)){
 			++_infor[(unsigned char)ch]._count;
+			ch = getc(fpOut);
 		}
 
 		//2. 构建赫夫曼树
@@ -95,8 +94,17 @@ public:
 		FILE* fpIn = _fpIn._p;
 		fseek(fpOut, 0, SEEK_SET);
 
-		//5.压缩配置信息(字符个数信息)
-		ConfigInfor infor;
+		//5.压缩配置信息
+		string postfix(fileName);//原文件后缀
+		char postfixBuff[16] = {0};
+		size_t pos = postfix.rfind('.');
+		if (pos != string::npos){
+			postfix = postfix.substr(pos, postfix.size() - pos);
+			strcpy(postfixBuff, postfix.c_str());
+		}
+		fwrite(postfixBuff, 1, 16, fpIn);
+
+		ConfigInfor infor;//字符个数信息
 		for (size_t i = 0; i < CHARSIZE; ++i){
 			if (_infor[i]._count != 0){
 				infor._ch = _infor[i]._ch;
@@ -109,8 +117,9 @@ public:
 
 		//6. 压缩编码信息
 		char readBuff[BUFFSIZE];
+		char writeBuff[BUFFSIZE];
 		size_t wIdx = 0;
-		size_t pos = 0;
+		pos = 0;
 		char value;
 
 		while (1){
@@ -131,16 +140,23 @@ public:
 					++pos;
 
 					if (8 == pos){//如果够八个位就写入文件
-						fputc(value, fpIn);
+						writeBuff[wIdx++] = value;
 						value = 0;
 						pos = 0;
+
+						if (wIdx == BUFFSIZE){
+							fwrite(writeBuff, 1, BUFFSIZE, fpIn);
+							memset(writeBuff, '\0', BUFFSIZE);
+							wIdx = 0;
+						}
 					}
 				}
 			}
 		}
 
 		if (0 != pos)
-			fputc(value, fpIn);
+			writeBuff[wIdx++] = value;
+		fwrite(writeBuff, 1, wIdx, fpIn);
 	}
 	//解压
 	void Decompress(const char* fileName)
@@ -149,8 +165,11 @@ public:
 		FILE* fpOut = _fpOut._p;
 
 		// 1.生成解压后文件名
+		char postfixBuff[16];
+		//memset(postfixBuff, '\0', 16);
+		fread(postfixBuff, 1, 16, fpOut);
 		string decompressFileName(fileName);
-		decompressFileName += ".uhcp";
+		decompressFileName += postfixBuff;
 
 		//2.读取字符个数信息
 		ConfigInfor infor;
@@ -178,6 +197,7 @@ public:
 		Node *cur = root;
 		long long count = root->_w._count;
 		char readBuff[BUFFSIZE];
+		char writeBuff[BUFFSIZE];
 		size_t wIdx = 0;
 		while (1){
 			size_t size = fread(readBuff, 1, BUFFSIZE, fpOut);
@@ -186,6 +206,7 @@ public:
 
 			for (size_t rIdx = 0; rIdx < size; ++rIdx){
 				char ch = readBuff[rIdx];
+	
 				for (size_t pos = 0; pos < 8; ++pos){
 					if (0 == (ch & (1 << pos)))
 						cur = cur->_left;
@@ -193,16 +214,24 @@ public:
 						cur = cur->_right;
 
 					if (NULL == cur->_left && NULL == cur->_right){
-						fputc(cur->_w._ch, fpIn);
+						writeBuff[wIdx++] = cur->_w._ch;
 						cur = root;
 						--count;
-
+						
 						if (0 == count)
 							break;
+
+						if (wIdx == BUFFSIZE){
+							fwrite(writeBuff, 1, BUFFSIZE, fpIn);
+							wIdx = 0;
+							memset(writeBuff, '\0', BUFFSIZE);
+						}
 					}
 				}
 			}
 		}
+
+		fwrite(writeBuff, 1, wIdx, fpIn);
 	}
 protected:
 	//获取霍夫曼编码
@@ -237,13 +266,14 @@ protected:
 
 #endif
 
-void TestCompress()
+void TestCompress(char* fileName)
 {
-	FileCompress fc;				// test.txt
-	fc.Compress("test.txt");		// --> test.txt.hcp
+	DataCompress fc;				// test.txt
+	fc.Compress(fileName);		// --> test.txt.hcp
 }
-void TestDeCompress()
+void TestDeCompress(char* fileName)
 {
-	FileCompress fc;							// test.txt.hcp
-	fc.Decompress("test.txt.hcp");			// --> test.txt.hcp.uhcp
+	DataCompress fc;							// test.txt.hcp
+	fc.Decompress(fileName);			// --> test.txt.hcp.txt
 }
+

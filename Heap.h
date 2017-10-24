@@ -38,7 +38,7 @@ public:
 				_a.push_back(a[i]);
 		}
 
-		for (int i = (_a.size()-2)/2; i > 0; --i)
+		for (int i = (int)(_a.size()-2)/2; i > 0; --i)
 			_AdjustDown(i);
 	}
 
@@ -72,7 +72,7 @@ protected:
 	//向下调整
 	void _AdjustDown(int parent)
 	{
-		size_t child = parent * 2 + 1;
+		int child = parent * 2 + 1;
 
 		while (child < _a.size()){
 			if (child + 1 < _a.size() && Com()(_a[child + 1], _a[child]))
@@ -86,9 +86,9 @@ protected:
 		}
 	}
 	//向上调整
-	void _AdjustUp(int child)
+	void _AdjustUp(size_t child)
 	{
-		int parent = (child - 1) / 2;
+		size_t parent = (child - 1) / 2;
 
 		while (0 != child){
 			if (Com()(_a[child], _a[parent])){
