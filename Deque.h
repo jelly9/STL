@@ -330,7 +330,7 @@ protected:
 	size_t _mapSize;
 	size_t _size;
 };
-#if 1
+#if 0
 void TestDeque()
 {
 	Deque<int, 3> d;
@@ -399,8 +399,12 @@ void TestDeque()
 	cout << i << endl;
 
 }
-
+#include <stack>
+#include <queue>
 #include <deque>
+stack<int> s;
+queue<int> q;
+
 void test_deque()
 {
 	deque<int> d;

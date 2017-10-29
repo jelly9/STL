@@ -1,7 +1,6 @@
 #ifndef __MY_STACK_H__
 #define __MY_STACK_H__
 
-#define TESTSTACK 1
 
 #include "D:\Github\STL\Deque.h"
 
@@ -28,7 +27,7 @@ protected:
 
 #endif
 
-#if TESTSTACK
+#if 0
 #include "D:\Github\STL\List.h"
 #include <iostream>
 using namespace std;
