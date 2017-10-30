@@ -12,7 +12,7 @@
 
 //声明
 //array相关
-//给一个长度为 len 的数组 a，用 begin——end（左闭右开） 之间的（伪）随机数初始化它，
+//给一个长度为 len 的数组 a，用 [ begin, end )之间的（伪）随机数初始化它，
 //默认情况下，用 0——100 之间的（伪）随机数初始化。
 void RandArrayEqual(int a[], size_t len, int begin, int end);	//允许有相同的数
 void RandArrayUnique(int a[], size_t len, int begin, int end);	//没有相同的数

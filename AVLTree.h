@@ -18,7 +18,7 @@ struct AVLTreeNode//AVLTrees树节点，三叉链
 	, _right(NULL)
 	, _parent(NULL)
 	{}
-	int _bf;//平衡因子
+	int _bf;//平衡因子,左-右
 	K _key;
 	V _value;
 	AVLTreeNode<K, V> *_left;
@@ -44,6 +44,7 @@ public:
 
 		Node *cur = _root;
 		Node *parent = NULL;
+
 		while (cur){//找插入位置
 			if (key < cur->_key){
 				parent = cur;
@@ -58,26 +59,35 @@ public:
 		}
 
 		cur = new Node(key, value);//插入结点
-		if (key < parent->_key)
+		if (key < parent->_key){
+			++parent->_bf;
 			parent->_left = cur;
+		}
 		else{
+			--parent->_bf;
 			parent->_right = cur;
+		}
 		cur->_parent = parent;
 
-		while (parent){//调整平衡因子
-			int bf = parent->_bf;
+		//cur = parent;
+		//parent = parent->_parent;
+		//while (parent){//调整平衡因子
+		//	int bf = parent->_bf;
+		//
+		//	if (cur == parent->_left)
+		//		++parent->_bf;
+		//	else
+		//		--parent->_bf;
+		//
+		//	if (abs(cur->_bf) < abs(bf))
+		//		return true;
+		//
+		//	cur = parent;
+		//	parent = parent->_parent;
+		//}
 
-			if (cur == parent->_left)
-				++parent->_bf;
-			else
-				--parent->_bf;
-
-			if (abs(cur->_bf) < abs(bf))
-				return true;
-
-			cur = parent;
-			parent = parent->_parent;
-		}
+		//调整平衡因子
+		
 	}
 
 	void InOrder()

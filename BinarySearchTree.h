@@ -66,6 +66,7 @@ public:
 					return false;
 			}
 
+			//申请节点并插入
 			cur = new Node(key);
 			if (key < parent->_key)
 				parent->_left = cur;
@@ -78,7 +79,7 @@ public:
 	}
 
 	//查找
-	Node* Find(const T& key)
+	const Node* Find(const T& key)
 	{
 		Node *cur = _root;
 		while (cur){
@@ -93,7 +94,7 @@ public:
 		return NULL;
 	}
 
-	bool Earse(const T& key)
+	bool Remove(const T& key)
 	{
 		Node *cur = _root;
 		Node *parent = NULL;
@@ -158,7 +159,6 @@ public:
 					cur = NULL;
 					return true;
 				}
-				
 
 				/*
 				//左为空
@@ -237,6 +237,32 @@ public:
 		return false;
 	}
 
+	//递归插入
+	bool InsertR(const T& key)
+	{
+		if (NULL == _root){
+			_root = new Node(key);
+			return true;
+		}
+		else
+			return _Insert(_root, NULL, key);
+	}
+
+	Node* FindR(const T& key)
+	{
+		return _Find(_root, key);
+	}
+	//递归删除
+	bool RemoveR(const T& key)
+	{
+		if (NULL == _root)
+			return false;
+
+		return _Remove(_root, key);
+
+	}
+
+	
 	void InOrder()
 	{
 		_InOrder(_root);
@@ -249,6 +275,86 @@ public:
 		_root = NULL;
 	}
 protected:
+	bool _Remove(Node* root, const T& key)
+	{
+		if (NULL == root)
+			return false;
+
+		if (key < root->_key)
+			return _Remove(root->_left, key);
+		else if (key > root->_key)
+			return _Remove(root->_right, key);
+		//走到这儿则说明当前节点即是待删除接节点
+		else{
+			//左右都不为空
+			if (root->_left && root->_right){
+				Node *subLMostR = root->_left;
+				while (subLMostR->_right)//找左子树最右节点
+					subLMostR = subLMostR->_right;
+
+				root->_key = subLMostR->_key;//替换
+
+				return _Remove(subLMostR, subLMostR->_key);
+			}
+			else{
+				Node* linkNode = NULL;
+				if (NULL == root->_left)//左为空
+					linkNode = root->_right;
+				else if (NULL == root->_right)//右为空
+					linkNode = root->_left;
+
+				if (root != _root){
+					if (root == root->_parent->_right)
+						root->_parent->_right = linkNode;
+					else
+						root->_parent->_left = linkNode;
+				}
+				else
+					_root = linkNode;
+
+				if (linkNode)//更新父节点
+					linkNode->_parent = root->_parent;
+
+				delete root;
+				root = NULL;
+				return true;
+			}
+		}
+	}
+
+	Node* _Find(Node* root, const T& key)
+	{
+		if (NULL == root)
+			return false;
+
+		if (key < root->_key)
+			return _Find(root->_left, key);
+		else if(key > root->_key)
+			return _Find(root->_right, key);
+		else//找到了
+			return root;
+	}
+	bool _Insert(Node *root, Node *parent, const T& key)
+	{
+		if (NULL == root){
+			Node *cur = new Node(key);
+			if (key < parent->_key)
+				parent->_left = cur;
+			else
+				parent->_right = cur;
+			cur->_parent = parent;
+
+			return true;
+		}
+
+		if (key < root->_key)
+			return _Insert(root->_left,root, key);
+		else if (key > root->_key)
+			return _Insert(root->_right, root, key);
+		else
+			return false;
+
+	}
 	void _Destroy(Node* root)
 	{
 		if (NULL == root)
@@ -276,33 +382,34 @@ protected:
 
 #if 1
 
+//一个包含常用算法的头文件（非标准库）
 #include "D:\Github\STL\Function.h"
 void TestBSTree()
 {
 #if 1
-	int a[100];
-	RandArrayUnique(a, sizeof(a)/sizeof(int));//用随机数填充数组 a[]
+	int a[20];
+	RandArrayUnique(a, sizeof(a)/sizeof(int));//用随机数[0, 100）填充数组 a[]
 #else
 	int a[] = {5, 3, 4, 1, 7, 8, 2, 6, 0, 9};
 #endif
 
 	BinarySearchTree<int> t;
 	for (size_t i = 0; i < sizeof(a) / sizeof(int); ++i)
-		t.Insert(a[i]);
+		t.InsertR(a[i]);
 
-	cout << t.Find(a[1])->_key << endl;
+	cout << t.FindR(a[1])->_key << endl;
 
 	t.InOrder();
-	t.Earse(a[3]);
-	t.Earse(a[2]);
-	t.Earse(a[0]);
-	t.Earse(a[1]);
-	t.Earse(a[5]);
-	t.Earse(a[7]);
-	t.Earse(a[8]);
-	t.Earse(a[6]);
-	t.Earse(a[9]);
-	t.Earse(a[4]);
+	t.RemoveR(a[3]);
+	t.RemoveR(a[2]);
+	t.RemoveR(a[0]);
+	t.RemoveR(a[1]);
+	t.RemoveR(a[5]);
+	t.RemoveR(a[7]);
+	t.RemoveR(a[8]);
+	t.RemoveR(a[6]);
+	t.RemoveR(a[9]);
+	t.RemoveR(a[4]);
 	t.InOrder();
 
 }
