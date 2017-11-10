@@ -8,7 +8,7 @@ using namespace std;
 template<class T, class Ref, class Ptr, size_t BuffSize = 8>
 struct __DequeIterator
 {
-	typedef T**										MapPointer;
+	typedef T**									MapPointer;
 	typedef __DequeIterator<T, T&, T*, BuffSize>	Iterator;
 	typedef __DequeIterator<T, Ref, Ptr, BuffSize>	Self;
 

@@ -81,15 +81,15 @@ public:
 			else{//	+/-2		¿ÉÒÔÐý×ªÁË
 				if (2 == parent->_bf){//	2
 					if (1 == cur->_bf)//	2	1	ÓÒ-ÓÒ
-						_RotateL(parent);
+						_RatateL(parent);
 					else//	2	-1		ÓÒ-×ó
-						_RotateRL(parent);
+						_RatateRL(parent);
 				}
 				else{//	-2
 					if (-1 == cur->_bf)//-2	-1	×ó-×ó
-						_RotateR(parent);
+						_RatateR(parent);
 					else//-2	1	×ó-ÓÒ
-						_RotateLR(parent);
+						_RatateLR(parent);
 				}
 				break;
 			}
@@ -137,7 +137,7 @@ protected:
 		height = (leftHeight > rightHeight) ? (leftHeight + 1) : (rightHeight + 1);
 		return true;
 	}
-	void _RotateL(Node *parent)//×óÐý
+	void _RatateL(Node *parent)//×óÐý
 	{
 		Node* subR = parent->_right;
 		Node* subRL = subR->_left;
@@ -164,7 +164,7 @@ protected:
 		subR->_bf = 0;
 		parent->_bf = 0;
 	}
-	void _RotateR(Node *parent)//ÓÒÐý
+	void _RatateR(Node *parent)//ÓÒÐý
 	{
 		Node *subL = parent->_left;
 		Node *subLR = subL->_right;
@@ -191,28 +191,28 @@ protected:
 		subL->_bf = 0;
 		parent->_bf = 0;
 	}
-	void _RotateLR(Node *parent)//×óÓÒË«Ðý
+	void _RatateLR(Node *parent)//×óÓÒË«Ðý
 	{
 		Node *subL = parent->_left;
 		Node *subLR = subL->_right;
 		int bf = subLR->_bf;
 
-		_RotateL(parent->_left);
-		_RotateR(parent);
+		_RatateL(parent->_left);
+		_RatateR(parent);
 
 		if (1 == bf)
 			subL->_bf = -1;
 		else if(-1 == bf)
 			parent->_bf = 1;
 	}
-	void _RotateRL(Node *parent)//ÓÒ×óË«Ðý
+	void _RatateRL(Node *parent)//ÓÒ×óË«Ðý
 	{
 		Node *subR = parent->_right;
 		Node *subRL = subR->_left;
 		int bf = subRL->_bf;
 
-		_RotateR(parent->_right);
-		_RotateL(parent);
+		_RatateR(parent->_right);
+		_RatateL(parent);
 	
 		if (1 == bf)
 			parent->_bf = -1;

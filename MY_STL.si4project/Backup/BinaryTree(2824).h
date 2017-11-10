@@ -10,9 +10,9 @@ using namespace std;
 
 //二叉树节点
 template<class T>
-struct __BinaryTreeNode
+struct BinaryTreeNode
 {
-	__BinaryTreeNode(const T& value)
+	BinaryTreeNode(const T& value)
 		:_value(value)
 		,_left(NULL)
 		,_right(NULL)
@@ -27,7 +27,7 @@ struct __BinaryTreeNode
 template<class T>
 class BinaryTree
 {
-	typedef __BinaryTreeNode<T> Node;
+	typedef BinaryTreeNode<T> Node;
 public:
 	//构造函数
 	BinaryTree()

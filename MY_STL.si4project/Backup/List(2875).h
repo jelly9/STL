@@ -36,10 +36,10 @@ struct ListIterator
 	ListIterator()
 		:_node(NULL)
 	{}
-	ListIterator( Node *node)
+	ListIterator(Node *node)
 		:_node(node)
 	{}
-	ListIterator(const Self& it)
+	ListIterator(Self& it)
 		:_node(it._node)
 	{}
 	//operator

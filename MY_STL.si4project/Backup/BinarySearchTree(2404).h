@@ -17,9 +17,9 @@ using namespace std;
 #endif
 
 template<class T>
-struct __BinarySearchTreeNode
+struct BinarySearchTreeNode
 {
-	__BinarySearchTreeNode(const T& key)
+	BinarySearchTreeNode(const T& key)
 	:_key(key)
 	,_parent(NULL)
 	,_left(NULL)
@@ -35,7 +35,7 @@ struct __BinarySearchTreeNode
 template<class T>
 class BinarySearchTree
 {
-	typedef __BinarySearchTreeNode<T> Node;
+	typedef BinarySearchTreeNode<T> Node;
 public:
 	BinarySearchTree()
 		:_root(NULL)

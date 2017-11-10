@@ -7,9 +7,9 @@
 
 //ºÕ·òÂüÊ÷½Úµã
 template<class W>
-struct __HuffmanTreeNode
+struct HuffmanTreeNode
 {
-	typedef __HuffmanTreeNode Self;
+	typedef HuffmanTreeNode Self;
 
 	HuffmanTreeNode(const W& w)
 		:_w(w)
@@ -41,7 +41,7 @@ struct __HuffmanTreeNode
 template<class W>
 class HuffmanTree
 {
-	typedef __HuffmanTreeNode<W> Node;
+	typedef HuffmanTreeNode<W> Node;
 public:
 	HuffmanTree(const W *arr, size_t size, const W& invalue)
 	{
