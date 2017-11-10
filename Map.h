@@ -22,7 +22,6 @@
 template<class Key, class Value>
 class Map
 {
-	template<class Key, class Value>
 	struct __KeyOfPair
 	{
 		Key operator()(const pair<Key, Value> kv){
@@ -30,7 +29,7 @@ class Map
 		}
 	};
 	typedef pair<const Key, Value> ValueType;
-	typedef RBTree<Key, ValueType, __KeyOfPair<Key, Value>> RepType;//容器类型
+	typedef RBTree<Key, ValueType, __KeyOfPair> RepType;//容器类型
 public:
 	typedef typename RepType::Iterator Iterator;
 	typedef typename RepType::ConstIterator ConstIterator;
@@ -69,9 +68,12 @@ public:
 private:
 	RepType _t;
 };
-#if 1
+
+
+#if 0
 
 #include "D:\Github\STL\Function.h"
+#include <string>
 void TestMap()
 {
 	//int a[100];
@@ -88,22 +90,33 @@ void TestMap()
 	//	++it;
 	//}
 
+	//Map<int, string> m;
+	//m[1] = "insert";
+	//m[2] = "delete";
+	//m[3] = "modify";
+	//m[4] = "find";
+
+	//Map<int, string>::Iterator it = m.Begin();
+	//while (it != m.End()){
+	//	cout << (*it).first << "->" << it->second.c_str() << endl;
+	//	++it;
+	//}
+
 	Map<string, string> m;
-	m.Insert(make_pair("insert", "insert"));
-	m.Insert(make_pair("delete", "delete"));
-	m.Insert(make_pair("modify", "modify"));
-	m.Insert(make_pair("find", "find"));
-	m["insert"] = "插入";
-	m["delete"] = "删除";
-	m["modify"] = "修改";
-	m["find"] = "查询";
+	m["insert"] = "in";
+	m["delete"] = "de";
+	m["modify"] = "mo";
+	m["find"] = "fi";
 
 	Map<string, string>::Iterator it = m.Begin();
 	while (it != m.End()){
-		cout << it->first << "->" << it->second << endl;
+		cout << (*it).first << "->" << it->second << endl;
 		++it;
 	}
 
+	//字符类的输出运算符重载于头文件<string>中
+	//string s("Hello world!");
+	//cout << s << endl;
 }
 #endif
 
