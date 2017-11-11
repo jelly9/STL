@@ -334,7 +334,7 @@ protected:
 	size_t _mapSize;
 	size_t _size;
 };
-#if 1
+#if 0
 
 #include "D:\Github\STL\Function.h"
 

@@ -17,8 +17,8 @@ public:
 	void Pop(){_s.PopBack();}
 	Ref Top(){return _s.Back();}
 	ConstRef Top()const{return _s.Back();}
-	bool Empty(){return _s.Empty();}
-	size_t Size(){return _s.Size();	}
+	bool Empty()const{return _s.Empty();}
+	size_t Size()const{return _s.Size();	}
 protected:
 	Sequence _s;
 };

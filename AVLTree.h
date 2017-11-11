@@ -241,6 +241,8 @@ protected:
 	Node *_root;
 };
 
+#if 0
+
 #include "D:\Github\STL\Function.h"
 
 void TestAVLTree()
@@ -257,4 +259,5 @@ void TestAVLTree()
 	t.InOrder();
 }
 
+#endif
 #endif

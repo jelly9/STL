@@ -67,12 +67,12 @@ struct __RBTreeNode
 	}
 };
 
-template<class ValueType, class Ref, class Ptr>
+template<class Value, class Ref, class Ptr>
 struct __RBTreeIterator
 {
-	typedef __RBTreeNode<ValueType>	Node;
-	typedef __RBTreeIterator<ValueType, ValueType&, ValueType*>	Iterator;
-	typedef __RBTreeIterator<ValueType, Ref, Ptr>	Self;
+	typedef __RBTreeNode<Value>	Node;
+	typedef __RBTreeIterator<Value, Value&, Value*>	Iterator;
+	typedef __RBTreeIterator<Value, Ref, Ptr>	Self;
 	Node *_node;
 
 	__RBTreeIterator()
@@ -173,6 +173,7 @@ struct __RBTreeIterator
 	}
 };
 
+#if TESTRBTREE
 template<class Key>
 struct __KeyOfValue
 {
@@ -181,26 +182,27 @@ struct __KeyOfValue
 		return k;
 	}
 };
-template<class Key, class ValueType>
+template<class Key, class Value>
 struct __KeyOfPair
 {
-	Key operator()(const pair<Key, ValueType>& kv)
+	Key operator()(const pair<Key, Value>& kv)
 	{
 		return kv.first;
 	}
 };
+#endif
 
 //红黑树
-template<class Key, class ValueType, class _KeyOfValue = __KeyOfValue<ValueType>>
+template<class Key, class Value, class _KeyOfValue = __KeyOfValue<Value>>
 class RBTree
 {
-	typedef __RBTreeNode<ValueType> Node;
+	typedef __RBTreeNode<Value> Node;
 public:
-	typedef __RBTreeIterator<ValueType, ValueType&, ValueType*>				Iterator;
-	typedef __RBTreeIterator<ValueType, const ValueType&, const ValueType*> ConstIterator;
+	typedef __RBTreeIterator<Value, Value&, Value*>				Iterator;
+	typedef __RBTreeIterator<Value, const Value&, const Value*> ConstIterator;
 public:
 	RBTree()
-		:_header(new Node(ValueType()))
+		:_header(new Node(Value()))
 	{
 		_header->_left = _header;
 		_header->_right = _header;
@@ -226,19 +228,19 @@ public:
 	}
 
 	//modify
-	pair<Iterator, bool> Insert(const ValueType& value)
+	pair<Iterator, bool> Insert(const Value& value)
 	{
 		Node *&root = _Root();
 
 		//对于空树需特殊处理
 		if (NULL == root){
 			root = new Node(value);
-			//_root = new Node(ValueType);
+			//_root = new Node(Value);
 			root->_parent = _header;
 			_header->_parent = root;
 			root->_color = BLACK;
-			_header->_left = __RBTreeNode<ValueType>::Minimum(root);
-			_header->_right = __RBTreeNode<ValueType>::Maximum(root);
+			_header->_left = __RBTreeNode<Value>::Minimum(root);
+			_header->_right = __RBTreeNode<Value>::Maximum(root);
 			++_nodeCount;
 			return make_pair(Iterator(root), true);
 		}
@@ -334,8 +336,8 @@ public:
 			}
 		}
 
-		_header->_left = __RBTreeNode<ValueType>::Minimum(root);
-		_header->_right = __RBTreeNode<ValueType>::Maximum(root);
+		_header->_left = __RBTreeNode<Value>::Minimum(root);
+		_header->_right = __RBTreeNode<Value>::Maximum(root);
 		root->_color = BLACK;
 		return make_pair(Iterator(newNode), true);
 	}
@@ -462,7 +464,7 @@ protected:
 
 #endif
 
-#if 0
+#if TESTRBTREE
 #include <map>
 #include <string>
 #include "D:\Github\STL\Function.h"

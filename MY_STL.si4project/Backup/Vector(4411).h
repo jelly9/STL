@@ -48,12 +48,15 @@ public:
 	}
 	Vector(const Vector<T>& v)
 	{
-		_Expand(v.Capacity());
-		for (size_t i = 0; i < v.Size(); ++i)
+		size_t size = v.Size();
+		size_t capacity = v.Capacity();
+		_Expand(capacity);
+		for (size_t i = 0; i < size; ++i)
 			_start[i] = v[i];
 
-		_finish = _start + v.Size();
-		_endOfStorage = _start + v.Capacity();
+		_finish = _start + size;
+		_endOfStorage = _start + capacity;
+		
 	}
 
 	Ref operator[](size_t n)
@@ -204,12 +207,6 @@ public:
 		assert(_start != _finish);
 		--_finish;
 	}
-	void Swap(Vector<T>& v)
-	{
-		std::swap(_start, v._start);
-		std::swap(_finish, v._finish);
-		std::swap(_endOfStorage, v._endOfStorage);
-	}
 
 	/////////////////////////////////////
 	//deconstruct
@@ -253,24 +250,20 @@ protected:
 
 
 
-#if 0
+#endif
 
 #include <iostream>
 using namespace std;
 
-#include <string>
-
-void PrintVector(const Vector<string>& V)
+void PrintVector(const Vector<int>& V)
 {
-	Vector<string>::ConstIterator it = V.Begin();
+	Vector<int>::ConstIterator it = V.Begin();
 	for (; it != V.End(); ++it)
 		cout << *it << ' ';
 	cout << endl;
 	cout << "Size: " << V.Size() << endl;
 	cout << "Capacity: " << V.Capacity() << endl;
 }
-
-//#include "D:\Github\STL\Function.h"
 
 void TestVector()
 {
@@ -281,20 +274,11 @@ void TestVector()
 	v.PushBack("2222");
 	v.PushBack("3333");
 	v.PushBack("4444");
-	PrintVector(v);
 
 
-	Vector<string> v2;
-	v2.PushBack("11");
-	v2.PushBack("22");
-	v2.PushBack("33");
-	v2.PushBack("44");
-	PrintVector(v2);
-
-	v2.Swap(v);
-	PrintVector(v);
-	PrintVector(v2);
-
+	Vector<string> v2(v);
+	
+	v[0] = v2[3];
 
 
 	//cout << v.Back() << endl;
@@ -322,6 +306,8 @@ void TestVector()
 	//v1.PopBack();
 	//PrintVector(v1);
 	
+
+
 	//Vector<int> v2;
 	//v2.PushBack(1);
 	//PrintVector(v2);
@@ -343,6 +329,7 @@ void TestVector()
 
 	//Vector<int> v4(10);
 	//PrintVector(v4);
+
 }
 
 //void PrintVector(const vector<int>& v)
@@ -376,6 +363,4 @@ void TestVector()
 //
 //	v[2] = v2[1];
 // }
-#endif
 
-#endif
