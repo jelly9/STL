@@ -108,11 +108,13 @@ void TestMap()
 	m["modify"] = "mo";
 	m["find"] = "fi";
 
-	Map<string, string>::Iterator it = m.Begin();
-	while (it != m.End()){
-		cout << (*it).first << "->" << it->second << endl;
-		++it;
-	}
+	PrintContainer(m);
+
+	//Map<string, string>::Iterator it = m.Begin();
+	//while (it != m.End()){
+	//	cout << (*it).first << "->" << it->second << endl;
+	//	++it;
+	//}
 
 	//字符类的输出运算符重载于头文件<string>中
 	//string s("Hello world!");

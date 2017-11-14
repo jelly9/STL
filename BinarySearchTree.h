@@ -388,7 +388,7 @@ void TestBSTree()
 {
 #if 1
 	int a[20];
-	RandArrayUnique(a, sizeof(a)/sizeof(int));//用随机数[0, 100）填充数组 a[]
+	RandomArrayUnique(a, sizeof(a)/sizeof(int));//用随机数[0, 100）填充数组 a[]
 #else
 	int a[] = {5, 3, 4, 1, 7, 8, 2, 6, 0, 9};
 #endif
