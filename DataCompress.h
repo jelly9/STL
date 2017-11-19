@@ -37,7 +37,7 @@ struct CharInfor
 
 class DataCompress
 {
-	typedef HuffmanTreeNode<CharInfor> Node;
+	typedef __HuffmanTreeNode<CharInfor> Node;
 	//智能文件指针，自动关闭文件
 	class FilePtr{
 		FilePtr(const FilePtr&);

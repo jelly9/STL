@@ -7,7 +7,6 @@ using namespace std;
 #include <vector>
 #include <assert.h>
 
-//比较器
 template<class T>
 struct Less
 {
@@ -38,21 +37,21 @@ public:
 				_a.push_back(a[i]);
 		}
 
-		for (int i = (int)(_a.size()-2)/2; i > 0; --i)
+		for (int i = (int)(_a.size() - 2) / 2; i >= 0; --i)
 			_AdjustDown(i);
 	}
 
 	void Push(T value)
 	{
 		_a.push_back(value);
-		_AdjustUp(_a.size()-1);
+		_AdjustUp(_a.size() - 1);
 	}
 
 	void Pop()
 	{
 		assert(!_a.empty());
 
-		swap(_a[0], _a[_a.size()-1]);
+		swap(_a[0], _a[_a.size() - 1]);
 		_a.pop_back();
 		_AdjustDown(0);
 	}
@@ -68,8 +67,22 @@ public:
 		return _a.size();
 	}
 
+	bool IsHeap()
+	{
+		int parent = 0;
+		int child = parent * 2 + 1;
+
+		while(child < _a.size()){
+			if (Com()(_a[child], _a[parent]) || 
+				child + 1<_a.size() && Com()(_a[child+1], _a[parent]))
+				return false;
+			++parent;
+			child = parent * 2 + 1;
+		}
+		return true;
+	}
+
 protected:
-	//向下调整
 	void _AdjustDown(int parent)
 	{
 		int child = parent * 2 + 1;
@@ -85,7 +98,6 @@ protected:
 			child = parent * 2 + 1;
 		}
 	}
-	//向上调整
 	void _AdjustUp(size_t child)
 	{
 		size_t parent = (child - 1) / 2;
@@ -104,32 +116,46 @@ protected:
 	vector<T> _a;
 };
 
-
 #endif
 
+#if 0
+
+#include <queue>
+#include <algorithm>
+void test_heap()
+{
+	vector<int> v;
+	v.push_back(1);
+	v.push_back(6);
+	v.push_back(2);
+	v.push_back(8);
+	v.push_back(5);
+	v.push_back(3);
+	make_heap(v.begin(), v.end());
+	priority_queue<int>  pq;
+
+}
 void TestHeap()
 {
-	int a[] = {1, 4, 6, 2, 8, 43, 30, 28};
-	Heap<int, Greater<int>> h(a, sizeof(a)/sizeof(a[0]), -1);
-	cout << h.Top() << endl;;
+	int a[] = { 1, 4, 6, 2, 8, 43, 30, 28 };
+	Heap<int, Greater<int>> h(a, sizeof(a) / sizeof(a[0]));
+	cout << "IsHeap? "<<h.IsHeap() << endl;
+	cout << h.Top() << endl;
 	h.Push(3);
-	cout << h.Top() << endl;;
+	cout << h.Top() << endl;
 	h.Pop();
-	cout << h.Top() << endl;;
+	cout << h.Top() << endl;
 }
 
-//求最大的K个用小堆
-//求最小的K个用大堆
 void TopK(const vector<int>& a, size_t K)
 {
-
 	assert(a.size() > K);
 	Heap<int, Less<int>> h;
 	for (size_t i = 0; i < K; ++i)
 		h.Push(a[i]);
 
 	for (size_t i = K; i < a.size(); ++i){
-		if (Greater<int>()(a[i],h.Top())){
+		if (Greater<int>()(a[i], h.Top())){
 			h.Pop();
 			h.Push(a[i]);
 		}
@@ -159,53 +185,47 @@ void TestTopK()
 	TopK(v, 5);
 }
 
-//堆排序
-vector<int> HeapSort(int *a, int size)
+//鍚戜笅璋冩暣
+void AdjustDown(int *a, size_t n, size_t p)
 {
-	vector<int> v;
-	v.resize(size);
-	for (int i = 0; i < size; ++i)
-		v[i] = a[i];
+	assert(a);
 
-	//建堆
-	//降序——小堆
-	//升序——大堆
-	for (int i = (size-2)/2; i > 0; --i){
-		int p = i;//父亲
-		int c = p * 2 + 1;//孩子
-		while (c < size){
-			if (c+1 < size && v[c+1] < v[c])//小堆
-				++c;
-			if (v[c] < v[p])
-				swap(v[c], v[p]);
-			p = c;
-			c = p * 2 + 1;
+	int parent = p;
+	int child = p * 2 + 1;
+	while (child <= n)
+	{
+		if (child + 1 < n && a[child] < a[child + 1])
+			++child;
+
+		if (a[parent] < a[child]){
+			swap(a[parent], a[child]);
+			parent = child;
+			child = parent * 2 + 1;
 		}
+		else
+			break;
 	}
+}
 
-	//排序
-	int end = size;//未排序的右区间
-	while (end > 0){
-		swap(v[0], v[end-1]);
+void HeapSort(int *a, int size)
+{
+
+	for (int i = size / 2 - 1; i >= 0; --i)
+		AdjustDown(a, size, i);
+
+	int end = size - 1;
+	while(end > 0)	{
+		swap(a[0], a[end]);
 		--end;
-		//重新调整堆
-		int p = 0;
-		int c = p * 2 + 1;//孩子
-		while (c < end){
-			if (c + 1 < end && v[c+1] < v[c])
-				++c;
-			if (v[c] < v[p])
-				swap(v[c], v[p]);
-			p = c;
-			c = p * 2 + 1;
-		}
+		AdjustDown(a, end, 0);
 	}
-	return v;
 }
 
 
 void TestHeapSort()
 {
-	int a[] = {1,3,5,7,9,10,8,6,4,2};
-	vector<int> v = HeapSort(a, sizeof(a)/ sizeof(a[0]));
+	int a[] = { 1, 3, 5, 7, 9, 8, 6, 4, 2, 0};
+	HeapSort(a, sizeof(a) / sizeof(a[0]));
 }
+
+#endif

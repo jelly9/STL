@@ -67,15 +67,7 @@ inline unsigned long __NextPrime(unsigned long n)
 	return i < 28 ? _primeList[i] : _primeList[27];
 }
 
-struct __KeyOfValue
-{
-	int operator()(const int value){
-		return value;
-	}
-};
-
-
-template<class Key, class Value, class _KeyOfValue = __KeyOfValue, class _HashFunc = __HashFunc<Key>>
+template<class Key, class Value, class _KeyOfValue, class _HashFunc >
 class HashTable
 {
 	typedef __HashTableNode<Value> Node;
@@ -176,10 +168,10 @@ struct __HashBucketNode
 	{}
 };
 
-template<class Key, class Value, class _KeyOfValue = __KeyOfValue, class _HashFunc = __HashFunc<Key>>
+template<class Key, class Value, class _KeyOfValue, class _Hash>
 class HashBucket;
 
-template<class Key, class Value, class _KeyOfValue = __KeyOfValue, class _Hash = __HashFunc<Key>>
+template<class Key, class Value, class _KeyOfValue, class _Hash>
 struct __HashBucketIterater
 {
 	typedef __HashBucketNode<Value> Node;
@@ -233,15 +225,6 @@ struct __HashBucketIterater
 		return *this;
 	}
 
-	//++i;
-	//i = i + 1;
-	//return i;
-
-	//i++;
-	//temp = i;
-	//i = i + 1;
-	//return temp;
-	
 	Iterator operator++(int)//后置
 	{
 		Iterator tmp(_node, _hb);
@@ -257,16 +240,20 @@ protected:
 		else{//是最后一个节点，则跳到下一个不为空的桶里
 			size_t hash = _Hash()(_KeyOfValue()(_node->_valueField)) % _hb->_bucket.size();
 			size_t i = hash + 1;
-			for (; i < _hb->_size; ++i){
-				if (_hb->_bucket[i])
-					break;
+			for (; i < _hb->_bucket.size(); ++i){
+				if (_hb->_bucket[i]){
+					_node = _hb->_bucket[i];
+					return;
+				}
 			}
-			_node = _hb->_bucket[i];
+
+			_node = NULL;
+			_hb = NULL;
 		}
 	}
 };
 
-template<class Key, class Value, class _KeyOfValue = __KeyOfValue, class _Hash = __HashFunc<Key>>
+template<class Key, class Value, class _KeyOfValue, class _Hash>
 class HashBucket
 {
 	typedef __HashBucketNode<Value> Node;
@@ -297,21 +284,21 @@ public:
 	}
 
 	//modify
-	pair<Iterator, bool> Find(const Key& key)
+	Iterator Find(const Key& key)
 	{
 		if (0 == _size)
-			return make_pair(Iterator(), false);
+			return Iterator();
 		size_t hash = _Hash()(key) % _bucket.size();
 		Node *cur = _bucket[hash];
 		while (cur){
 			if (key == _KeyOfValue()(cur->_valueField))
-				return make_pair(Iterator(cur, this), true);
+				return Iterator(cur, this);
 			cur = cur->_next;
 		}
-		return make_pair(Iterator(), false);
+		return Iterator();
 	}
 
-	bool InsertUnique(const Value& value)
+	pair<Iterator, bool> InsertUnique(const Value& value)
 	{
 		//如果找到相同的就不插了
 		_CheckCapacity();
@@ -319,7 +306,7 @@ public:
 		Node *cur = _bucket[hash];
 		while (cur){
 			if (_KeyOfValue()(cur->_valueField) == _KeyOfValue()(value))
-				return false;
+				return make_pair(Iterator(), false);
 			cur = cur->_next;
 		}
 
@@ -327,11 +314,11 @@ public:
 		_bucket[hash] = new Node(value);
 		_bucket[hash]->_next = head;
 		++_size;
-
-		return true;
+	
+		return make_pair(Iterator(_bucket[hash], this), false);
 	}
 
-	bool InsertEqual(const Value& value)
+	pair<Iterator, bool> InsertEqual(const Value& value)
 	{
 		//如果找到相同的就不插了
 		_CheckCapacity();
@@ -340,21 +327,22 @@ public:
 		_bucket[hash] = new Node(value);
 		_bucket[hash]->_next = head;
 		++_size;
-		return true;
+		return make_pair(Iterator(_bucket[hash], this), true);
+
 	}
 
-	bool Remove(const Key& key)
+	bool Erase(const Key& key)
 	{
 		if (0 == _size)
 			return false;
 
-		pair<Iterator, bool> it = Find(key);
+		Iterator it = Find(key);
 
 		//没找到
-		if (0 == it.second)
+		if (Iterator() == it)
 			return false;
 
-		Node *cur = it.first._node;
+		Node *cur = it._node;
 
 		if (cur->_next){
 			cur->_valueField = cur->_next->_valueField;
@@ -363,6 +351,8 @@ public:
 
 			delete del;
 			del = NULL;
+			--_size;
+			return true;
 		}
 		else{
 			size_t hash = _Hash()(key) % _bucket.size();
@@ -372,6 +362,8 @@ public:
 
 			delete head;
 			head = NULL;
+			--_size;
+			return true;
 		}
 
 		return false;
@@ -384,6 +376,11 @@ public:
 	size_t Capacity()
 	{
 		return _bucket.size();
+	}
+
+	size_t Empty()
+	{
+		return 0 == _size;
 	}
 protected:
 	void _CheckCapacity()
@@ -416,11 +413,18 @@ protected:
 
 #endif
 
-#if 1
+#if 0
 //测试
 #include "D:\Github\STL\Function.h"
 #include <vector>
 
+struct KeyOfValue
+{
+	int operator()(const int k)
+	{
+		return k;
+	}
+};
 struct KeyOfPair
 {
 	string operator()(const pair<string, string> kv)
@@ -439,43 +443,49 @@ void TestHashBucket()
 	//hb.InsertEqual(3);
 	//hb.InsertEqual(54);
 
-	//HashBucket<string, pair<string, string>, KeyOfPair> hb;
-	//hb.InsertUnique(make_pair("INSERT", "insert"));
-	//hb.InsertUnique(make_pair("DELETE", "delete"));
-	//hb.InsertUnique(make_pair("MODIFY", "modify"));
-	//hb.InsertUnique(make_pair("SERACH", "search"));
-	//hb.InsertUnique(make_pair("LEFT", "left"));
-	//hb.InsertUnique(make_pair("RIGHT", "right"));
-	//hb.InsertUnique(make_pair("PARENT", "parent"));
+	HashBucket<string, pair<string, string>, KeyOfPair, __HashFunc<string>> hb;
+	hb.InsertUnique(make_pair("INSERT", "insert"));
+	hb.InsertUnique(make_pair("DELETE", "delete"));
+	hb.InsertUnique(make_pair("MODIFY", "modify"));
+	hb.InsertUnique(make_pair("SERACH", "search"));
+	hb.InsertUnique(make_pair("LEFT", "left"));
+	hb.InsertUnique(make_pair("RIGHT", "right"));
+	hb.InsertUnique(make_pair("PARENT", "parent"));
 
-	const int N = 1000;
-	int a[N];
-	
-	RandomArrayUnique(a, N);
-
-	HashBucket<int, int> hb;
-	for (size_t i = 0; i < N; ++i){
-		hb.InsertUnique(a[i]);
-		hb.Find(a[i]);
-	}
-
-
-	HashBucket<int, int>::Iterator it = hb.Begin();
+	HashBucket<string, pair<string, string>, KeyOfPair, __HashFunc<string>>::Iterator it = hb.Begin();
 	while (it != hb.End()){
-		cout << *it << ' ';
+		cout << it->first << ' ';
 		++it;
 	}
 
-	for (size_t i = 0; i < N; ++i){
-		hb.Remove(a[i]);
-		hb.Find(a[i]);
-	}
+	//const int N = 1000;
+	//int a[N];
+	//
+	//RandomArrayUnique(a, N);
 
-	HashBucket<int, int>::Iterator it = hb.Begin();
-	while (it != hb.End()){
-		cout << *it << ' ';
-		++it;
-	}
+	//HashBucket<int, int, KeyOfValue, __HashFunc<int>> hb;
+	//for (size_t i = 0; i < N; ++i){
+	//	hb.InsertUnique(a[i]);
+	//	hb.Find(a[i]);
+	//}
+
+
+	//HashBucket<int, int, KeyOfValue, __HashFunc<int>>::Iterator it = hb.Begin();
+	//while (it != hb.End()){
+	//	cout << *it << ' ';
+	//	++it;
+	//}
+
+	//for (size_t i = 0; i < N; ++i){
+	//	hb.Erase(a[i]);
+	//	hb.Find(a[i]);
+	//}
+
+	//it = hb.Begin();
+	//while (it != hb.End()){
+	//	cout << *it << ' ';
+	//	++it;
+	//}
 
 	cout << endl;
 }
@@ -503,7 +513,7 @@ void TestHashTable()
 	int a[100];
 	RandomArrayUnique(a, sizeof(a)/sizeof(int));
 
-	HashTable<int, int> ht;
+	HashTable<int, int, KeyOfValue, __HashFunc<int>> ht;
 	for (size_t i = 0; i < sizeof(a) / sizeof(int); ++i)
 		ht.Insert(a[i]);
 

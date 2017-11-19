@@ -4,39 +4,50 @@
 #pragma once
 
 #include "D:\Github\STL\Heap.h"
+#include <iostream>
+using namespace std;
 
-//ºÕ·òÂüÊ÷½Úµã
+//èµ«å¤«æ›¼æ ‘èŠ‚ç‚¹
 template<class W>
 struct __HuffmanTreeNode
 {
-	typedef __HuffmanTreeNode Self;
+	typedef __HuffmanTreeNode<W> Node;
 
-	HuffmanTreeNode(const W& w)
+	__HuffmanTreeNode(){}
+
+	__HuffmanTreeNode(const W& w)
 		:_w(w)
 		, _left(NULL)
 		, _right(NULL)
-		,_parent(NULL)
+		, _parent(NULL)
 	{}
 
-	Self operator + (const Self& h)const
+	Node operator + (const Node& h)const
 	{
-		Self temp;
+		Node temp;
 		temp._w = _w + h._w;
 		return temp;
 	}
-
-	bool operator !=(const Self& h)const
+	bool operator<(const Node& node)
+	{
+		return _w < node._w;
+	}
+	bool operator>(const Node& node)
+	{
+		return _w > node._w;
+	}
+	bool operator !=(const Node& h)const
 	{
 		return _w != h._w;
 	}
-	bool operator ==(const Self& h)const
+	bool operator ==(const Node& h)const
 	{
 		return _w == h._w;
 	}
 	W _w;
-	HuffmanTreeNode* _left;
-	HuffmanTreeNode* _right;
-	HuffmanTreeNode* _parent;
+	Node* _left;
+	Node* _right;
+	Node* _parent;
 };
 template<class W>
 class HuffmanTree
@@ -45,13 +56,13 @@ class HuffmanTree
 public:
 	HuffmanTree(const W *arr, size_t size, const W& invalue)
 	{
-		struct NodePtrCom{//¶¨ÖÆ»ô·òÂüÊ÷½Úµã±È½ÏÆ÷
+		struct _NodePtrCom{//å®šåˆ¶éœå¤«æ›¼æ ‘èŠ‚ç‚¹æ¯”è¾ƒå™¨
 			bool operator()(const Node* l, const Node* r){
 				return l->_w < r->_w;
 			}
 		};
 
-		Heap<Node*, NodePtrCom> h;//½èÖú¶Ñ¹¹½¨»ô·òÂüÊ÷
+		Heap<Node*, _NodePtrCom> h;//å€ŸåŠ©å †æ„å»ºéœå¤«æ›¼æ ‘
 		for (size_t i = 0; i < size; ++i){
 			if (arr[i] != invalue)
 				h.Push(new Node(arr[i]));
@@ -63,7 +74,7 @@ public:
 			Node *right = h.Top();
 			h.Pop();
 
-			Node *parent = new Node(left->_w + right->_w);//ÓÃ×îĞ¡µÄÁ½¸ö½Úµã¹¹½¨¸¸½Úµã
+			Node *parent = new Node(left->_w + right->_w);//ç”¨æœ€å°çš„ä¸¤ä¸ªèŠ‚ç‚¹æ„å»ºçˆ¶èŠ‚ç‚¹
 			parent->_left = left;
 			parent->_right = right;
 			left->_parent = parent;
@@ -81,10 +92,11 @@ public:
 	~HuffmanTree()
 	{
 		_Destroy(_root);
+		_root = NULL;
 	}
 protected:
-	HuffmanTree(const HuffmanTree<W>& h);
-	HuffmanTree<W> operator =(const HuffmanTree<W>& h);
+	//HuffmanTree(const HuffmanTree<W>& h);
+	//HuffmanTree<W> operator=(const HuffmanTree<W>& h);
 protected:
 	void _Destroy(Node *root)
 	{
@@ -105,7 +117,7 @@ protected:
 
 void TestHuffmanTree()
 {
-	int a[] = {1, 2, 3, 4};
+	int a[] = { 1, 2, 3, 4 };
 
-	HuffmanTree<int> h(a, sizeof(a)/sizeof(a[0]), -1);
+	HuffmanTree<int> h(a, sizeof(a) / sizeof(a[0]), -1);
 }
