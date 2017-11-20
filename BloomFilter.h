@@ -1,7 +1,7 @@
 /*
 *
 * 版权 : 		(c) 2017
-* 模块名 :
+* 模块名 :		DS
 * 文件名 :		BloomFilter.h
 * 作者 :		肖国栋
 *				1799553128@qq.com
@@ -109,7 +109,7 @@ protected:
 };
 #endif
 
-#if 1
+#if 0
 //测试
 void TestBloomFilter()
 {

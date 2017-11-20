@@ -173,13 +173,13 @@ struct __RBTreeIterator
 	}
 };
 
-#if TESTRBTREE
-template<class Key>
+#if 0
+template<class Value>
 struct __KeyOfValue
 {
-	Key operator()(const Key& k)
+	Value operator()(const Value& v)
 	{
-		return k;
+		return v;
 	}
 };
 template<class Key, class Value>
@@ -464,7 +464,7 @@ protected:
 
 #endif
 
-#if TESTRBTREE
+#if 0
 #include <map>
 #include <string>
 #include "D:\Github\STL\Function.h"

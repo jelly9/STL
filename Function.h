@@ -10,56 +10,30 @@
 #include <stdlib.h>
 #include <time.h>
 #include <iostream>
-#include "D:\Github\STL\Map.h"
 
 //声明
-
-//用随机数初始化数组
-void RandomArrayEqual(int a[], size_t len, int begin, int end);		//允许有相同的数
-void RandomArrayUnique(int a[], size_t len, int begin, int end);	//没有相同的数
+// 用随机数初始化数组
+void RandomArray(int a[], size_t len, int begin, int end);
 //打印数组
 void PrintArray(int a[], size_t len);
-//打印自定义容器
+// 打印容器
 template<class Container>
 void PrintContainer(const Container& l);
 
-//比较相关仿函数
-template<class T>
-struct Less{
-	bool operator()(const T& l, const T& r){
-		return l < r; 
-	}
-};
-
-template<class T>
-struct Greater{
-	bool operator()(const T& l, const T& r){ 
-		return l > r; 
-	}
-};
+//检查是否有序
+bool IsIncresing(int *a, size_t size);
+bool IsIncresing(int *a, size_t size);
 
 
-//定义
-///////////////////////////////////////////////////////////////////////
-
-void RandomArrayEqual(int a[], size_t len, int begin = 0, int end = 100)
-{
-	srand((unsigned int)time(NULL));
-
-	int interval = end - begin;
-	for (size_t i = 0; i < len; ++i)
-		a[i] = rand() % interval + begin;
-	//PrintArray(a, len);
-}
-
-void RandomArrayUnique(int a[], size_t len, int begin = 0, int end = INT_MAX)
+// 定义
+void RandomArrayUnique(int a[], size_t size, int begin = 0, int end = INT_MAX)
 {
 	srand((unsigned int)time(NULL));
 
 	int interval = end - begin;	//区间内数的个数
 	int randNum;					//生成的随机数
 
-	for (size_t i = 0; i < len; ++i){
+	for (size_t i = 0; i < size; ++i){
 		while (1){
 			randNum = rand() % interval + begin;
 			size_t j = 0;
@@ -72,14 +46,41 @@ void RandomArrayUnique(int a[], size_t len, int begin = 0, int end = INT_MAX)
 		}
 		a[i] = randNum;
 	}
-	//PrintArray(a, len);
 }
 
-void PrintArray(int a[], size_t len)
+void PrintArray(int *a, size_t size)
 {
-	for (size_t i = 0; i < len; ++i)
+	for (size_t i = 0; i < size; ++i)
 		printf("%d ", a[i]);
 	printf("\n");
+}
+
+bool IsIncresing(int *a, size_t size)
+{
+	bool flag = true;
+	for (size_t i = 1; i < size; ++i){
+		if (a[i - 1] > a[i]){
+			std::cout << "error! " << "a[" << i - 1 << "]=" << a[i - 1]
+				<< " a[" << i << "]=" << a[i] << std::endl;
+			flag = false;
+		}
+	}
+
+	return flag;
+}
+
+bool IsDecresing(int *a, size_t size)
+{
+	bool flag = true;
+	for (size_t i = 1; i < size; ++i){
+		if (a[i - 1] < a[i]){
+			std::cout << "error! " << "a[" << i - 1 << "]=" << a[i - 1]
+				<< "a[" << i << "]=" << a[i] << std::endl;
+			flag = false;
+		}
+	}
+
+	return flag;
 }
 
 template<class Container>
