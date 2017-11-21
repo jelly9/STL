@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <iostream>
+#include <assert.h>
 
 //声明
 // 用随机数初始化数组
@@ -57,16 +58,15 @@ void PrintArray(int *a, size_t size)
 
 bool IsIncresing(int *a, size_t size)
 {
-	bool flag = true;
+	bool flag;
 	for (size_t i = 1; i < size; ++i){
 		if (a[i - 1] > a[i]){
-			std::cout << "error! " << "a[" << i - 1 << "]=" << a[i - 1]
+			std::cout << "error!!!!!!!!!!!!!!!!!!!!!!!" <<std::endl  << "a[" << i - 1 << "]=" << a[i - 1]
 				<< " a[" << i << "]=" << a[i] << std::endl;
 			flag = false;
 		}
 	}
-
-	return flag;
+	return true;
 }
 
 bool IsDecresing(int *a, size_t size)

@@ -111,26 +111,105 @@ void HeapSort(int *a, size_t n)
 	}
 }
 
+void BubbleSort(int *a, size_t n)
+{
+	bool flag = false;//标记是否有过交换
+	for (size_t i = 0; i < n - 1; ++i){
+		for (size_t j = 0; j < n - i - 1; ++j){
+			if (a[j] > a[j + 1]){
+				swap(a[j], a[j + 1]);
+				flag = true;
+			}
+		}
+
+		if (!flag)//如果没交换过则已经有序，可以直接退出
+			break;
+	}
+}
+
+//左右指针法
+static int __PartSort_1(int *a, int left, int right)
+{
+	int &key = a[right];
+	while (left < right){
+		while (left < right && a[left] <= key)//从前往后找到一个比key大的
+			++left;
+		while (left < right && a[right] >= key)//从后往前找到一个比key小的
+			--right;
+		swap(a[left],a[right]);//交换
+	}
+	swap(a[left], key);//将key放的正确位置
+	return left;
+}
+
+//挖坑法
+static int __PartSort_2(int *a, int left, int right)
+{
+	int key = a[right];
+	while (left < right){
+		while (left < right && a[left] <= key)
+			++left;
+		swap(a[left], a[right]);
+
+		while (left < right && a[right] >= key)
+			--right;
+		swap(a[left], a[right]);
+	}
+
+	return left;
+}
+
+//前后指针法
+static int __PartSort_3(int *a, int left, int right)
+{
+	int &key = a[right];
+	int cur = 0;
+	int prev = -1;
+	while (cur < right){
+		if (a[cur] <= key && ++prev != cur)
+			swap(a[prev], a[cur]);
+		++cur;
+	}
+
+	swap(a[++prev], key);
+	return prev;
+}
+
+void QuickSort(int *a, int left, int right)
+{
+	if (left >= right)
+		return;
+	
+	int mid = __PartSort_3(a, left, right);
+	QuickSort(a, left, mid - 1);
+	QuickSort(a, mid+1, right);
+}
+
 #endif
 
 #if 1
 //测试
 
-const int N = 10;
 
 void TestSort()
 {
 
 #if 0
-	int a[N] = {2, 5, 4, 9, 3, 6, 8, 7, 1 ,0};
+	const int N = 10;
+	//int a[N] = {2, 0, 4, 9, 3, 6, 8, 7, 1 ,5};
+	int a[N] = {2, 0, 5, 9, 3, 5, 8, 7, 1 ,5};
 #else
+	const int N = 100;
 	int a[N];
 	RandomArrayUnique(a, N, 0, 100);
 #endif
 	//InsertSort(a, N);
 	//ShellSort(a, N);
 	//SelectSort(a, N);
-	HeapSort(a, N);
+	//HeapSort(a, N);
+	//BubbleSort(a, N);
+	PrintArray(a, N);
+	QuickSort(a, 0, N-1);
 	PrintArray(a, N);
 	IsIncresing(a, N);
 }

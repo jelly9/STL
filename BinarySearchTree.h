@@ -3,18 +3,14 @@
 时间：2017.10.27
 */
 
-#ifndef __BINARY_SEARCH_TREE__
-#define __BINARY_SEARCH_TREE__
+#ifndef __BINARY_SEARCH_TREE_H__
+#define __BINARY_SEARCH_TREE_H__
 
 #pragma once
 
 #include <iostream>
 using namespace std;
 #include <assert.h>
-
-#ifndef NULL
-#define NULL 0
-#endif
 
 template<class T>
 struct __BinarySearchTreeNode
@@ -25,7 +21,7 @@ struct __BinarySearchTreeNode
 	,_left(NULL)
 	,_right(NULL)
 	{}
-	typedef BinarySearchTreeNode<T> Node;
+	typedef __BinarySearchTreeNode<T> Node;
 	T _key;
 	Node *_left;
 	Node *_right;
@@ -79,19 +75,17 @@ public:
 	}
 
 	//查找
-	const Node* Find(const T& key)
+	Node* Find(const T& key)
 	{
 		Node *cur = _root;
-		while (cur){
+		while (NULL != cur && key != cur->_key){
 			if (key < cur->_key)
 				cur = cur->_left;
-			else if (key > cur->_key)
-				cur = cur->_right;
 			else
-				return cur;
+				cur = cur->_right;
 		}
 
-		return NULL;
+		return cur;
 	}
 
 	bool Remove(const T& key)
@@ -159,79 +153,6 @@ public:
 					cur = NULL;
 					return true;
 				}
-
-				/*
-				//左为空
-				if (NULL == cur->_left){
-					if (cur != _root){
-						if (cur == parent->_left)
-							parent->_left = cur->_right;
-						else
-							parent->_right = cur->_right;
-
-						//delete cur;
-						//cur = NULL;
-						//return true;
-					}
-					else{
-						_root = cur->_right;
-						//delete cur;
-						//cur = NULL;
-						//return true;
-					}
-
-					if (cur->_right)
-						cur->_right->_parent = parent;
-
-					delete cur;
-					cur = NULL;
-					return true;
-				}
-				//右为空
-				else if (NULL == cur->_right){
-					if (cur != _root){
-						if (cur == parent->_left)
-							parent->_left = cur->_left;
-						else
-							parent->_right = cur->_left;
-
-						//delete cur;
-						//cur = NULL;
-						//return true;
-					}
-					else{
-						_root = cur->_left;
-						//delete cur;
-						//cur = NULL;
-						//return true;
-					}
-					if (cur->_left)
-						cur->_left->_parent = parent;
-					delete cur;
-					cur = NULL;
-					return true;
-				}
-				//左右都不空
-				else{
-					Node *subLMostR = cur->_left;
-					while (subLMostR->_right)//找左子树最右节点
-						subLMostR = subLMostR->_right;
-
-					cur->_key = subLMostR->_key;
-					Node *subLMostRP = subLMostR->_parent;
-					if (subLMostR == subLMostRP->_right)
-						subLMostRP->_right = subLMostR->_left;
-					else
-						subLMostRP->_left = subLMostR->_left;
-
-					if (subLMostR->_left)
-						subLMostR->_left->_parent = subLMostRP;
-
-					delete subLMostR;
-					subLMostR = NULL;
-					return true;
-				}
-				*/
 			}
 		}
 		return false;
@@ -324,15 +245,13 @@ protected:
 
 	Node* _Find(Node* root, const T& key)
 	{
-		if (NULL == root)
-			return false;
+		if (NULL == root || key == root->_key)
+			return root;
 
 		if (key < root->_key)
 			return _Find(root->_left, key);
-		else if(key > root->_key)
+		else 
 			return _Find(root->_right, key);
-		else//找到了
-			return root;
 	}
 	bool _Insert(Node *root, Node *parent, const T& key)
 	{
@@ -382,7 +301,6 @@ protected:
 
 #if 1
 
-//一个包含常用算法的头文件（非标准库）
 #include "D:\Github\STL\Function.h"
 void TestBSTree()
 {
