@@ -21,8 +21,10 @@
 #pragma once
 #include "D:\Github\STL\Function.h"
 #include <iostream>
+#include <stack>
 using namespace std;
 
+/***********插入排序*************/
 void InsertSort(int *a, size_t n)
 {
 	//把第i个数插入到[0, i-1]有序区间内，使插入后的序列人保持有序
@@ -37,6 +39,7 @@ void InsertSort(int *a, size_t n)
 	}
 }
 
+/***********希尔排序*************/
 void ShellSort(int *a, size_t n)
 {
 	//在插入排序的基础上分区间
@@ -52,10 +55,10 @@ void ShellSort(int *a, size_t n)
 			}
 			a[end + gap] = key;
 		}
-		//PrintArray(a, n);
 	}
 }
 
+/***********选择排序*************/
 void SelectSort(int *a, size_t n)
 {
 	//在[start, end]区间内选一个最小的、一个最大的值， 分别于start、end交换， 缩小区间重复进行
@@ -78,6 +81,7 @@ void SelectSort(int *a, size_t n)
 	}
 }
 
+/***********堆排序*************/
 //向下调整
 static void __AdjustDown(int *a, size_t size, int n)
 {
@@ -111,6 +115,7 @@ void HeapSort(int *a, size_t n)
 	}
 }
 
+/***********冒泡排序*************/
 void BubbleSort(int *a, size_t n)
 {
 	bool flag = false;//标记是否有过交换
@@ -127,6 +132,8 @@ void BubbleSort(int *a, size_t n)
 	}
 }
 
+
+/***********快速排序*************/
 //左右指针法
 static int __PartSort_1(int *a, int left, int right)
 {
@@ -175,14 +182,99 @@ static int __PartSort_3(int *a, int left, int right)
 	return prev;
 }
 
-void QuickSort(int *a, int left, int right)
+//[left, rigth]//左闭右闭的区间
+static void __QuickSort(int *a, int left, int right)
 {
 	if (left >= right)
 		return;
 	
 	int mid = __PartSort_3(a, left, right);
-	QuickSort(a, left, mid - 1);
-	QuickSort(a, mid+1, right);
+	__QuickSort(a, left, mid - 1);
+	__QuickSort(a, mid+1, right);
+}
+
+void QuickSort(int *a, size_t n)
+{
+	__QuickSort(a, 0, n-1);
+}
+//非递归
+void QuickSortNoR(int *a, size_t n)
+{
+	int left = 0;
+	int right = n - 1;
+	int mid;
+	stack<int> s;
+	s.push(right);
+	s.push(left);
+
+	while (!s.empty()){
+		left = s.top();
+		s.pop();
+		right = s.top();
+		s.pop();
+
+		mid = __PartSort_1(a, left, right);
+		
+		if (left < mid - 1){
+			s.push(mid - 1);
+			s.push(left);
+		}
+
+		if (mid + 1 < right){
+			s.push(right);
+			s.push(mid+1);
+		}
+	}
+}
+
+/***********归并排序*************/
+//[left, rigth]//左闭右闭的区间
+//进行归并
+static void __Merge(int *a, int left, int mid, int right, int *tmp)
+{
+	int i = left;
+	int j = mid + 1;
+	int k = left;
+	while (i <= mid && j <= right){
+		if (a[i] <= a[j])
+			tmp[k++] = a[i++];
+		else
+			tmp[k++] = a[j++];
+	}
+
+	while (i <= mid)
+		tmp[k++] = a[i++];
+
+	while (j <= right)
+		tmp[k++] = a[j++];
+
+
+	memcpy(a + left, tmp + left, (right - left + 1)*sizeof(int));
+}
+
+static void __MergeSort(int *a, int left, int right, int *tmp)
+{
+	if (left >= right)
+		return;
+
+	int mid = left + (right - left) / 2;
+	__MergeSort(a, left, mid, tmp);//左区间有序
+	__MergeSort(a, mid +1, right, tmp);//右区间有序
+	__Merge(a, left, mid, right, tmp);//将左右有序区间的归并
+}
+
+void MergeSort(int *a, size_t n) 
+{
+	int *tmp = new int[n];//将归并后的数据先放到辅助空间，结束后再拷回来
+	__MergeSort(a, 0, n-1, tmp);
+	delete[] tmp;
+}
+
+//非比较排序
+/***********计数排序*************/
+void CountSort(int * a, size_t n)
+{
+
 }
 
 #endif
@@ -194,22 +286,23 @@ void QuickSort(int *a, int left, int right)
 void TestSort()
 {
 
-#if 0
+#if 1
 	const int N = 10;
-	//int a[N] = {2, 0, 4, 9, 3, 6, 8, 7, 1 ,5};
-	int a[N] = {2, 0, 5, 9, 3, 5, 8, 7, 1 ,5};
+	int a[N] = {2, 0, 4, 9, 3, 6, 8, 7, 1 ,5};
+	//int a[N] = {2, 0, 5, 9, 3, 5, 8, 7, 1 ,5};
 #else
-	const int N = 100;
+	const int N = 10000;
 	int a[N];
-	RandomArrayUnique(a, N, 0, 100);
+	RandomArray(a, N);
 #endif
 	//InsertSort(a, N);
 	//ShellSort(a, N);
 	//SelectSort(a, N);
 	//HeapSort(a, N);
 	//BubbleSort(a, N);
-	PrintArray(a, N);
-	QuickSort(a, 0, N-1);
+	//QuickSort(a, N);
+	//QuickSortNoR(a, N);
+	MergeSort(a, N);
 	PrintArray(a, N);
 	IsIncresing(a, N);
 }

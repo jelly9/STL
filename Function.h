@@ -27,7 +27,7 @@ bool IsIncresing(int *a, size_t size);
 
 
 // 定义
-void RandomArrayUnique(int a[], size_t size, int begin = 0, int end = INT_MAX)
+void RandomArray(int a[], size_t size, int begin = 0, int end = INT_MAX)
 {
 	srand((unsigned int)time(NULL));
 
@@ -45,6 +45,19 @@ void RandomArrayUnique(int a[], size_t size, int begin = 0, int end = INT_MAX)
 			if (j == i)
 				break;
 		}
+		a[i] = randNum;
+	}
+}
+
+void RandomArray_Equal(int a[], size_t size, int begin = 0, int end = INT_MAX)
+{
+	srand((unsigned int)time(NULL));
+
+	int interval = end - begin;	//区间内数的个数
+	int randNum;					//生成的随机数
+
+	for (size_t i = 0; i < size; ++i){
+		randNum = rand() % interval + begin;
 		a[i] = randNum;
 	}
 }

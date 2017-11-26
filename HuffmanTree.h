@@ -54,7 +54,7 @@ class HuffmanTree
 {
 	typedef __HuffmanTreeNode<W> Node;
 public:
-	HuffmanTree(const W *arr, size_t size, const W& invalue)
+	HuffmanTree(const W *arr, size_t size, const W& invalid)
 	{
 		struct _NodePtrCom{//定制霍夫曼树节点比较器
 			bool operator()(const Node* l, const Node* r){
@@ -64,7 +64,7 @@ public:
 
 		Heap<Node*, _NodePtrCom> h;//借助堆构建霍夫曼树
 		for (size_t i = 0; i < size; ++i){
-			if (arr[i] != invalue)
+			if (arr[i] != invalid)
 				h.Push(new Node(arr[i]));
 		}
 

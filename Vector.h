@@ -5,11 +5,10 @@
 #ifndef __VECTOR_H__
 #define __VECTOR_H__
 
-#include <assert.h>
+#include <iostream>
+using namespace std;
 
-#ifndef NULL
-#define NULL 0
-#endif
+#include <assert.h>
 
 template<class T>
 class Vector
@@ -253,7 +252,7 @@ protected:
 
 
 
-#if 0
+#if 1
 
 #include <iostream>
 using namespace std;
@@ -277,7 +276,7 @@ void TestVector()
 	Vector<string> v;
 	//v.Resize(5, 10);
 	//v.Resize(10, 20);
-	v.PushBack("1111");
+	v.PushBack("ÄãºÃ");
 	v.PushBack("2222");
 	v.PushBack("3333");
 	v.PushBack("4444");
