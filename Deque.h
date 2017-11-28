@@ -12,7 +12,7 @@ struct __DequeIterator
 	typedef __DequeIterator<T, T&, T*, BuffSize>	Iterator;
 	typedef __DequeIterator<T, Ref, Ptr, BuffSize>	Self;
 
-	typedef __DequeIterator Self;
+	//typedef __DequeIterator Self;
 
 	//构造函数
 	__DequeIterator()
@@ -120,8 +120,6 @@ public:
 	//construction
 	Deque()
 		:_map(NULL)
-		, _start()
-		, _finish()
 		,_mapSize(0)
 		,_size(0)
 	{
@@ -153,22 +151,30 @@ public:
 	void PopBack()
 	{
 		--_finish;
-		if (_finish._cur == _finish._last)
-			delete[] *(_finish._node - 1);
+		if (_finish._cur == _finish._last){
+			delete[] * (_finish._node - 1);
+			*(_finish._node - 1) = NULL;
+		}
 
-		if (_finish == _start)
+		if (_finish == _start){
 			delete[] _map;
+			_map = NULL;
+		}
 		--_size;
 	}
 
 	void PopFront()
 	{
 		++_start;
-		if (_start._cur == _start._first)
-			delete[] *(_start._node - 1);
+		if (_start._cur == _start._first){
+			delete[] * (_start._node - 1);
+			*(_start._node - 1) = NULL;
+		}
 
-		if (_finish == _start)
+		if (_finish == _start){
 			delete _map;
+			_map = NULL;
+		}
 		--_size;
 	}
 
@@ -226,11 +232,16 @@ public:
 		if (_map){
 			T** cur = _start._node;
 			for (; cur != _finish._node; ++cur){
-				delete[] *cur;
+				if (*cur){
+					delete[] * cur;
+					*cur = NULL;
+				}
+			}
+
+			if (*cur){
+				delete[] * cur;
 				*cur = NULL;
 			}
-			delete[] *cur;
-			*cur = NULL;
 			delete[] _map;
 			_map = NULL;
 		}
@@ -242,6 +253,8 @@ protected:
 		if (NULL == _map || _map + _mapSize - 1 == _finish._node){//如果中控器容量不足则给中控器扩容
 			size_t newSize = _mapSize == 0 ? 2 : _mapSize * 2;
 			MapPointer temp = new T*[newSize];//申请新空间
+			for (size_t i = 0; i < newSize; ++i)
+				*(temp + i) = NULL;
 			
 			size_t addToNode = _mapSize / 2;	//0
 			for (size_t i = 0; i < _mapSize; ++i)//拷贝旧中控器
@@ -259,15 +272,14 @@ protected:
 				_start.SetNode(temp + addToNode + oldStartNode);
 				_finish.SetNode(temp + addToNode + oldFinishNode);
 			}
-			else{
+			else{//说明是第一次增容（在此之前，没有空间）
 				*(_map) = new T[BuffSize];
 
 				_finish.SetNode(temp);
 				_start.SetNode(temp);
 				_finish._cur = *(_map) + BuffSize / 2;
 				_start._cur = *(_map) + BuffSize / 2;
-				*(_finish._cur) = value;
-				++_finish._cur;
+				*(_finish._cur++) = value;
 				++_size;
 				_mapSize = newSize;
 				return;
@@ -328,13 +340,13 @@ protected:
 		++_size;
 	}
 protected:
-	MapPointer _map;
-	Iterator _start;
-	Iterator _finish;
-	size_t _mapSize;
-	size_t _size;
+	MapPointer _map;//管理中控器的指针
+	Iterator _start;//指向被管理的第一个数据
+	Iterator _finish;//指向被管理的最后一个数据的下一个位置
+	size_t _mapSize;//有多少个中控器
+	size_t _size;//有多少个数据
 };
-#if 0
+#if 1
 
 #include "D:\Github\STL\Function.h"
 
@@ -345,11 +357,41 @@ void PrintDeque(const Deque<int>& d)
 		cout << *it << ' ';
 	cout << endl;
 }
+
+
+void TestDeque2()
+{
+	const int N = 1000;
+	int a[N];
+	RandomArray(a, N);
+
+	Deque<int> d;
+
+	size_t i = 0;
+	for (; i < N/2; ++i)
+		d.PushBack(a[i]);
+	//PrintDeque(d);
+	cout << d.Size() << ' ';
+
+	for (; i < N; ++i)
+		d.PushFront(a[i]);
+	//PrintDeque(d);
+	cout << d.Size() << ' ';
+
+	i = 0;
+	for (; i < N / 2; ++i)
+		d.PopFront();
+	//PrintDeque(d);
+	cout << d.Size() << ' ';
+
+	for (; i < N; ++i)
+		d.PopBack();
+	//PrintDeque(d);
+	cout << d.Size() << endl;
+
+}
 void TestDeque()
 {
-	char a = 10;
-	int &b = a;
-
 	Deque<int> d;
 	d.PushBack(1);
 	d.PushBack(2);
