@@ -4,7 +4,6 @@
 #include <iostream>
 using namespace std;
 
-//#include "D:\Github\STL\stack.h"
 #include <stack>
 
 struct Pos

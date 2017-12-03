@@ -8,6 +8,7 @@ using namespace std;
 #include <queue>
 #include <assert.h>
 
+
 //二叉树节点
 template<class T>
 struct __BinaryTreeNode
@@ -19,8 +20,8 @@ struct __BinaryTreeNode
 	{}
 
 	T _value;
-	BinaryTreeNode<T> *_left;
-	BinaryTreeNode<T> *_right;
+	__BinaryTreeNode<T> *_left;
+	__BinaryTreeNode<T> *_right;
 };
 
 //二叉树
@@ -74,7 +75,7 @@ public:
 			}
 			//遍历右子树
 			cur = s.top();
-			s.pop(); 
+			s.pop();
 			cur = cur->_right;
 		}
 		cout << endl;
@@ -138,9 +139,9 @@ public:
 			cur = q.front();
 			cout << cur->_value << ' ';
 			q.pop();
-			if(cur->_left)
+			if (cur->_left)
 				q.push(cur->_left);
-			if(cur->_right)
+			if (cur->_right)
 				q.push(cur->_right);
 		}
 		cout << endl;
@@ -167,16 +168,103 @@ public:
 		assert(k > 0);
 		return _LevelKNode(_root, k);
 	}
+
+	Node* Find(const T& value)
+	{
+		return _Find(_root, value);
+	}
 	
+	////////////////////
+	//获取最近公共祖先
+	Node* GetCommenAncestor(Node *x1, Node *x2)
+	{
+		stack<Node*> path1;
+		stack<Node*> path2;
+
+		_GetPath(_root, x1, path1);
+		_GetPath(_root, x2, path2);
+
+		if (path1.empty() || path2.empty())
+			return NULL;
+
+		Node* ancestor = path1.top();
+		while (!path1.empty() && !path2.empty()){
+			ancestor = path1.top();
+
+			path1.pop();
+			path2.pop();
+
+			if (!path1.empty() && !path2.empty()
+				&& path1.top() != path2.top())
+				break;
+		}
+
+		return ancestor;
+	}
+
+	//获取最远节点距离
+	int MaxLen()
+	{
+		int maxLen = 0;
+		_MaxLen(_root, maxLen);
+		return maxLen;
+	}
+
+
+	/////////////////////////////
 
 	//析构函数
 	~BinaryTree()
 	{
 		_DestroyTree(_root);
 	}
-
-
 protected:
+	int _MaxLen(Node *root, int& maxLen)
+	{
+		if (NULL == root)
+			return 0;
+		int leftLen = _MaxLen(root->_left, maxLen);
+		int rightLen = _MaxLen(root->_right, maxLen);
+
+		if (maxLen < (leftLen + rightLen))
+			maxLen = leftLen + rightLen;
+
+		return leftLen > rightLen ? leftLen + 1 : rightLen + 1;
+	}
+
+	Node* _Find(Node *root, const T& value)
+	{
+		if (NULL == root)
+			return NULL;
+
+		if (value == root->_value)
+			return root;
+
+		Node* retL = _Find(root->_left, value);
+
+		if (retL)
+			return retL;
+		else
+			return _Find(root->_right, value);
+	}
+
+	bool _GetPath(Node *root, Node* cur, stack<Node*>& path)
+	{
+		if (NULL == root)
+			return false;
+
+		if (root == cur){
+			path.push(root);
+			return true;
+		}
+
+		if (_GetPath(root->_left, cur, path) || _GetPath(root->_right, cur, path)){
+			path.push(root);
+			return true;
+		}
+
+		return false;
+	}
 	size_t _LevelKNode(Node* root, int k)
 	{
 		if (NULL == root)
@@ -273,6 +361,110 @@ private:
 
 #endif
 
+typedef __BinaryTreeNode<int> Node;
+
+static Node* __RebuildTree(vector<int> preOrder, vector<int> inOrder
+	,int& preIndex, int begin, int end)
+{
+	if (begin > end)
+		return NULL;
+
+	Node* root = new Node(preOrder[preIndex]);
+
+	int rootIndex = begin;
+	while (rootIndex <= end){
+		if (inOrder[rootIndex] == preOrder[preIndex])
+			break;
+		++rootIndex;
+	}
+
+	assert(rootIndex <= end);
+
+	if (begin <= rootIndex - 1)
+		root->_left = __RebuildTree(preOrder, inOrder, ++preIndex, begin, rootIndex - 1);
+	else
+		root->_left = NULL;
+
+	if (rootIndex + 1 <= end)
+		root->_right = __RebuildTree(preOrder, inOrder, ++preIndex, rootIndex + 1, end);
+	else
+		root->_right = NULL;
+
+	return root;
+}
+
+Node* RebuildTree(const vector<int>& preOrder, const vector<int>& inOrder)
+{
+	assert(preOrder.size() == inOrder.size());
+	int preIndex = 0;
+	int begin = 0;
+	int end = preOrder.size()-1;
+
+	return __RebuildTree(preOrder, inOrder, preIndex, begin, end);
+}
+
+class Stack
+{
+public:
+	void Push(int x)
+	{
+		_s.push(x);
+
+		if (_minS.empty() || x < _minS.top())
+			_minS.push(x);
+		else
+			_minS.push(_minS.top());
+	}
+	void Pop()
+	{
+		_s.pop();
+		_minS.pop();
+	}
+
+	int& Min()
+	{
+		return _minS.top();
+	}
+private:
+	stack<int> _s;
+	stack<int> _minS;
+};
+
+void TestStack()
+{
+
+	Stack s;
+	s.Push(6);
+	s.Push(2);
+	s.Push(1);
+	s.Push(3);
+	s.Push(10);
+	s.Push(0);
+}
+
+
+void TestRebuilTree()
+{
+	vector<int> preOrder;
+	preOrder.push_back(1);
+	preOrder.push_back(2);
+	preOrder.push_back(3);
+	preOrder.push_back(4);
+	preOrder.push_back(5);
+	preOrder.push_back(6);
+
+	vector<int> inOrder;
+	inOrder.push_back(3);
+	inOrder.push_back(2);
+	inOrder.push_back(4);
+	inOrder.push_back(1);
+	inOrder.push_back(6);
+	inOrder.push_back(5);
+
+	Node* root = RebuildTree(preOrder, inOrder);
+}
+
+
 void TestBinaryTree()
 {
 	int a1[] = { 1, 2, 3, '#', '#', 4, '#', '#', 5, 6 };
@@ -291,15 +483,20 @@ void TestBinaryTree()
 
 	int a2[] = { 1, 2, '#', 3, '#', '#', 4, 5, '#', 6, '#', 7, '#', '#', 8 };
 	BinaryTree<int> t(a2, sizeof(a2) / sizeof(a2[0]), '#');
-	t.PreOrder();
-	t.InOrder();
-	t.PostOrder();
-	t.PreOrderNoR();
-	t.InOrderNoR();
-	t.PostOrderNoR();
-	t.LevelOrder();
-	cout << "size: " << t.Size() << endl;
-	cout << "height: " << t.Height() << endl;
-	cout << "leafnode: " << t.LeafNode() << endl;
-	cout << "levelKNode: " << t.LevelKNode(13) << endl;
+
+	__BinaryTreeNode<int>* x1 = t.Find(2);
+	__BinaryTreeNode<int>* x2 = t.Find(8);
+
+	__BinaryTreeNode<int>* ancestor = t.GetCommenAncestor(x1, x2);
+//	t.PreOrder();
+//	t.InOrder();
+//	t.PostOrder();
+//	t.PreOrderNoR();
+//	t.InOrderNoR();
+//	t.PostOrderNoR();
+//	t.LevelOrder();
+//	cout << "size: " << t.Size() << endl;
+//	cout << "height: " << t.Height() << endl;
+//	cout << "leafnode: " << t.LeafNode() << endl;
+//	cout << "levelKNode: " << t.LevelKNode(13) << endl;
 }

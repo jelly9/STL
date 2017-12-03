@@ -274,7 +274,86 @@ void MergeSort(int *a, size_t n)
 /***********计数排序*************/
 void CountSort(int * a, size_t n)
 {
+	int max = a[0];//区间内最大值
+	int min = a[0];//区间内最小值
 
+	for (size_t i = 1; i < n; ++i){
+		if (max < a[i])
+			max = a[i];
+
+		if (min > a[i])
+			min = a[i];
+	}
+
+	int range = max - min +1;//区间大小
+	int *tmp = new int[range];
+	memset(tmp, 0, sizeof(int)*range);
+
+	size_t i = 0;
+	for (; i < n; ++i)
+		++tmp[a[i] - min];
+
+	i = 0;
+	for (size_t j = 0; j < range; ++j){
+		while (0 != tmp[j]){
+			a[i] = j + min;
+			--tmp[j];
+			++i;
+		}
+	}
+}
+
+
+//获取数组中数的最高位数{8, 7, 19, 26, 130} -> 3	{90， 2， 100， 1024} -> 4
+static int __GetMaxDigit(int *a, int n)
+{
+	int digit = 0;
+	int num = 1;
+
+	for (size_t i = 0; i < n; ++i){
+		while (0 != a[i] / num){	// 8   7		19		26		130	...		
+			++digit;				// 1   1		2		2		3	...
+			num *= 10;			// 10  10	100		100		100	...
+		}
+	}
+
+	return digit;
+}
+
+//基数排序
+void RadixSort(int *a, const int n)
+{
+	int maxDigit = __GetMaxDigit(a, n);
+	int *tmp = new int[n];
+	int base = 1;//用于确定是第几位
+
+	for (size_t digit = 0; digit < maxDigit; ++digit){
+		int count[10] = { 0 };
+		int start[10] = { 0 };
+
+		//统计digit位为i的数据个数
+		size_t i = 0;
+		for (; i < n; ++i)
+			++count[(a[i]/base)%10];
+
+		//统计数据的起始位置
+		i = 1;
+		for(; i < 10; ++i)
+			start[i] = start[i-1] + count[i-1];
+
+		//按位排序
+		i = 0;
+		for (; i < n; ++i){
+			int& idx = start[a[i] / base % 10];//计算a[i]在数组中的位置
+			tmp[idx] = a[i];
+			++idx;
+		}
+
+		base *= 10;
+		memcpy(a, tmp, sizeof(int)*n);//将排好的数据拷贝到原空间
+	}
+
+	delete tmp;
 }
 
 #endif
@@ -282,19 +361,19 @@ void CountSort(int * a, size_t n)
 #if 1
 //测试
 
-
 void TestSort()
 {
 
-#if 1
+#if 0
 	const int N = 10;
-	int a[N] = {2, 0, 4, 9, 3, 6, 8, 7, 1 ,5};
+	int a[N] = {2, 0, 400, 9, 3, 6, 8, 7, 19 ,5};
 	//int a[N] = {2, 0, 5, 9, 3, 5, 8, 7, 1 ,5};
 #else
-	const int N = 10000;
+	const int N = 100;
 	int a[N];
 	RandomArray(a, N);
 #endif
+	PrintArray(a, N);
 	//InsertSort(a, N);
 	//ShellSort(a, N);
 	//SelectSort(a, N);
@@ -302,7 +381,9 @@ void TestSort()
 	//BubbleSort(a, N);
 	//QuickSort(a, N);
 	//QuickSortNoR(a, N);
-	MergeSort(a, N);
+	//MergeSort(a, N);
+	//CountSort(a, N);
+	RadixSort(a,N);
 	PrintArray(a, N);
 	IsIncresing(a, N);
 }

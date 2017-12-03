@@ -183,6 +183,19 @@ public:
 
 	}
 
+	Node* ToSortList()
+	{
+		Node *prev = NULL;
+
+		_ToSortList(_root, prev);
+
+		Node *head = _root;
+
+		while (head && head->_left)
+			head = head->_left;
+
+		return head;
+	}
 	
 	void InOrder()
 	{
@@ -196,6 +209,23 @@ public:
 		_root = NULL;
 	}
 protected:
+
+	void _ToSortList(Node *cur, Node *&prev)
+	{
+		if (NULL == cur)
+			return;
+
+		_ToSortList(cur->_left, prev);
+
+		cur->_left = prev;
+		if (NULL != prev)
+			prev->_right = cur;
+
+		prev = cur;
+
+		_ToSortList(cur->_right, prev);
+	}
+
 	bool _Remove(Node* root, const T& key)
 	{
 		if (NULL == root)
@@ -304,9 +334,9 @@ protected:
 #include "D:\Github\STL\Function.h"
 void TestBSTree()
 {
-#if 1
+#if 0
 	int a[20];
-	RandomArrayUnique(a, sizeof(a)/sizeof(int));//用随机数[0, 100）填充数组 a[]
+	RandomArray(a, sizeof(a)/sizeof(int));//用随机数[0, 100）填充数组 a[]
 #else
 	int a[] = {5, 3, 4, 1, 7, 8, 2, 6, 0, 9};
 #endif
@@ -315,20 +345,26 @@ void TestBSTree()
 	for (size_t i = 0; i < sizeof(a) / sizeof(int); ++i)
 		t.InsertR(a[i]);
 
-	cout << t.FindR(a[1])->_key << endl;
+	__BinarySearchTreeNode<int> * head = t.ToSortList();
+	__BinarySearchTreeNode<int> *cur = head;
+	while (cur && cur->_right){
+		cout << cur->_key << ' ';
+		cur = cur->_right;
+	}
 
-	t.InOrder();
-	t.RemoveR(a[3]);
-	t.RemoveR(a[2]);
-	t.RemoveR(a[0]);
-	t.RemoveR(a[1]);
-	t.RemoveR(a[5]);
-	t.RemoveR(a[7]);
-	t.RemoveR(a[8]);
-	t.RemoveR(a[6]);
-	t.RemoveR(a[9]);
-	t.RemoveR(a[4]);
-	t.InOrder();
+	//cout << t.FindR(a[1])->_key << endl;
+	//t.InOrder();
+	//t.RemoveR(a[3]);
+	//t.RemoveR(a[2]);
+	//t.RemoveR(a[0]);
+	//t.RemoveR(a[1]);
+	//t.RemoveR(a[5]);
+	//t.RemoveR(a[7]);
+	//t.RemoveR(a[8]);
+	//t.RemoveR(a[6]);
+	//t.RemoveR(a[9]);
+	//t.RemoveR(a[4]);
+	//t.InOrder();
 
 }
 

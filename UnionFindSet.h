@@ -80,7 +80,7 @@ private:
 
 #endif
 
-#if 0
+#if 1
 //测试
 
 void Friends(size_t n, size_t m, int r[][2])
