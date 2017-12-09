@@ -116,6 +116,8 @@ class Deque
 public:
 	typedef __DequeIterator<T, T&, T*, BuffSize>				Iterator;
 	typedef __DequeIterator<T, const T&, const T*, BuffSize>	ConstIterator;
+	typedef T& Ref;
+	typedef const T& ConstRef;
 public:
 	//construction
 	Deque()

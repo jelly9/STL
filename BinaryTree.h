@@ -403,45 +403,6 @@ Node* RebuildTree(const vector<int>& preOrder, const vector<int>& inOrder)
 	return __RebuildTree(preOrder, inOrder, preIndex, begin, end);
 }
 
-class Stack
-{
-public:
-	void Push(int x)
-	{
-		_s.push(x);
-
-		if (_minS.empty() || x < _minS.top())
-			_minS.push(x);
-		else
-			_minS.push(_minS.top());
-	}
-	void Pop()
-	{
-		_s.pop();
-		_minS.pop();
-	}
-
-	int& Min()
-	{
-		return _minS.top();
-	}
-private:
-	stack<int> _s;
-	stack<int> _minS;
-};
-
-void TestStack()
-{
-
-	Stack s;
-	s.Push(6);
-	s.Push(2);
-	s.Push(1);
-	s.Push(3);
-	s.Push(10);
-	s.Push(0);
-}
-
 
 void TestRebuilTree()
 {

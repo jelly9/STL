@@ -171,28 +171,40 @@ void SetSymmetricDifference(InputIterator1 first1, InputIterator1 last1,//set_sy
 
 #if 1
 #include "D:\Github\STL\Function.h"
+#include "D:\Github\STL\Vector.h"
 #include <vector>
 void TestSet()
 {
-	Set<int> s1;//1 3 6 7 10
-	s1.Insert(10);
-	s1.Insert(3);
-	s1.Insert(7);
-	s1.Insert(1);
-	s1.Insert(6);
+	//Set<int> s1;//1 3 6 7 10
+	//s1.Insert(10);
+	//s1.Insert(3);
+	//s1.Insert(7);
+	//s1.Insert(1);
+	//s1.Insert(6);
 
-	Set<int> s2;//2 3 6 7 15
-	s2.Insert(7);
-	s2.Insert(3);
-	s2.Insert(15);
-	s2.Insert(2);
-	s2.Insert(6);
+	//Set<int> s2;//2 3 6 7 15
+	//s2.Insert(7);
+	//s2.Insert(3);
+	//s2.Insert(15);
+	//s2.Insert(2);
+	//s2.Insert(6);
+
+	Vector<int> s1;//1 3 6 7 10
+	s1.PushBack(1);
+	s1.PushBack(3);
+	s1.PushBack(6);
+	s1.PushBack(7);
+	s1.PushBack(10);
+
+	Vector<int> s2;//2 3 6 7 15
+	s2.PushBack(2);
+	s2.PushBack(3);
+	s2.PushBack(6);
+	s2.PushBack(7);
+	s2.PushBack(15);
 
 	SetSymmetricDifference(s1.Begin(), s1.End(), s2.Begin(), s2.End());
 	cout << endl;
-	
-	
-	
 	SetUnion(s1.Begin(), s1.End(), s2.Begin(), s2.End());
 	cout << endl;
 	SetIntersection(s1.Begin(), s1.End(), s2.Begin(), s2.End());
@@ -205,46 +217,42 @@ void TestSet()
 #include <algorithm>
 void test_set()
 {
+	//set<int> s1;//1 3 6 7 10
+	//s1.insert(10);
+	//s1.insert(3);
+	//s1.insert(7);
+	//s1.insert(1);
+	//s1.insert(6);
 
-	//vector<int> s1;//1 3 6 7 10
-	//s1.push_back(10);
-	//s1.push_back(3);
-	//s1.push_back(7);
-	//s1.push_back(1);
-	//s1.push_back(6);
-	//sort(s1.begin(), s1.end());
+	//set<int> s2;//2 3 6 7 15
+	//s2.insert(7);
+	//s2.insert(3);
+	//s2.insert(15);
+	//s2.insert(2);
+	//s2.insert(6);
 
-	//vector<int> s2;//2 3 6 7 15
-	//s2.push_back(7);
-	//s2.push_back(3);
-	//s2.push_back(15);
-	//s2.push_back(2);
-	//s2.push_back(6);
-	//sort(s2.begin(), s2.end());
+	vector<int> s1;//1 3 6 7 10
+	s1.push_back(10);
+	s1.push_back(3);
+	s1.push_back(7);
+	s1.push_back(1);
+	s1.push_back(6);
+	sort(s1.begin(), s1.end());
 
-	set<int> s1;//1 3 6 7 10
-	s1.insert(10);
-	s1.insert(3);
-	s1.insert(7);
-	s1.insert(1);
-	s1.insert(6);
+	vector<int> s2;//2 3 6 7 15
+	s2.push_back(7);
+	s2.push_back(3);
+	s2.push_back(15);
+	s2.push_back(2);
+	s2.push_back(6);
+	sort(s2.begin(), s2.end());
 
-	set<int> s2;//2 3 6 7 15
-	s2.insert(7);
-	s2.insert(3);
-	s2.insert(15);
-	s2.insert(2);
-	s2.insert(6);
-
-	set_union(s1.begin(), s1.end(), s2.begin(), s2.end(), ostream_iterator<int>(cout, " "));//1 2 3 6 7 15
+	set_union(s1.begin(), s1.end(), s2.begin(), s2.end(), ostream_iterator<int>(cout, " "));//参数三表示输出处理结果
 	cout << endl;
-	
 	set_intersection(s1.begin(), s1.end(), s2.begin(), s2.end(), ostream_iterator<int>(cout, " "));//3 6 7
 	cout << endl;
-	
 	set_difference(s1.begin(), s1.end(), s2.begin(), s2.end(), ostream_iterator<int>(cout, " "));//1 10
 	cout << endl;
-	
 	set_symmetric_difference(s1.begin(), s1.end(), s2.begin(), s2.end(), ostream_iterator<int>(cout, " "));//1 2 10 15
 	cout << endl;
 
