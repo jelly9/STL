@@ -118,7 +118,7 @@ protected:
 
 #endif
 
-#if 0
+#if 1
 
 #include <queue>
 #include <algorithm>
@@ -138,7 +138,7 @@ void test_heap()
 void TestHeap()
 {
 	int a[] = { 1, 4, 6, 2, 8, 43, 30, 28 };
-	Heap<int, Greater<int>> h(a, sizeof(a) / sizeof(a[0]));
+	Heap<int, Greater<int>> h(a, sizeof(a) / sizeof(a[0]), -1);
 	cout << "IsHeap? "<<h.IsHeap() << endl;
 	cout << h.Top() << endl;
 	h.Push(3);
@@ -147,15 +147,16 @@ void TestHeap()
 	cout << h.Top() << endl;
 }
 
-void TopK(const vector<int>& a, size_t K)
+void TopK_H(const vector<int>& a, size_t K)
 {
 	assert(a.size() > K);
-	Heap<int, Less<int>> h;
+	Heap<int, Less<int>> h;//最大的k个用小堆
+	Greater<int> com;
 	for (size_t i = 0; i < K; ++i)
 		h.Push(a[i]);
 
 	for (size_t i = K; i < a.size(); ++i){
-		if (Greater<int>()(a[i], h.Top())){
+		if (com(a[i], h.Top())){
 			h.Pop();
 			h.Push(a[i]);
 		}
@@ -166,11 +167,68 @@ void TopK(const vector<int>& a, size_t K)
 		cout << h.Top() << ' ';
 		h.Pop();
 	}
+	cout << endl;
+}
+
+//向下调整，小堆
+void _AdjustDown(int *a, size_t n, int p)
+{
+	assert(a);
+
+	int parent = p;
+	int child = p * 2 + 1;
+	while (child < n)
+	{
+		if ((child + 1) < n && a[child] > a[child + 1])
+			++child;
+
+		if (a[parent] > a[child]){
+			swap(a[parent], a[child]);
+			parent = child;
+			child = parent * 2 + 1;
+		}
+		else
+			break;
+	}
+}
+
+
+//最大的k个
+void TopK(int *a, int size, int k)
+{
+	assert(a);
+
+	int *tmp = new int[k];
+
+	size_t i = 0;
+	for (; i < k; ++i)
+		tmp[i] = a[i];
+
+	int parent = k/2-1;
+	for(; parent >= 0; --parent)
+		_AdjustDown(tmp, k, 0);//小堆
+
+	i = k;
+	for (; i < size; ++i){
+		if (a[i] > tmp[0]){
+			tmp[0] = a[i];
+			_AdjustDown(tmp, k, 0);
+		}
+	}
+
+	for (i = 0; i < k; ++i)
+		cout << tmp[i] << " ";
+	cout << endl;
+
+	delete[] tmp;
 }
 
 void TestTopK()
 {
-	vector<int> v(100, 20);
+	const int N = 100;
+	const int K = 8;
+#if 1
+	vector<int> v(N, 20);
 	v[10] = 11;
 	v[11] = 13;
 	v[12] = 15;
@@ -182,42 +240,35 @@ void TestTopK()
 	v[23] = 140;
 	v[24] = 150;
 
-	TopK(v, 5);
+	TopK_H(v, K);
+#endif
+
+	int a[N] = {0};
+	a[10] = 11;
+	a[11] = 13;
+	a[12] = 15;
+	a[13] = 17;
+	a[14] = 19;
+	a[20] = 110;
+	a[21] = 120;
+	a[22] = 130;
+	a[23] = 140;
+	a[24] = 150;
+	TopK(a, N, K);
 }
 
-//向下调整
-void AdjustDown(int *a, size_t n, size_t p)
-{
-	assert(a);
-
-	int parent = p;
-	int child = p * 2 + 1;
-	while (child <= n)
-	{
-		if (child + 1 < n && a[child] < a[child + 1])
-			++child;
-
-		if (a[parent] < a[child]){
-			swap(a[parent], a[child]);
-			parent = child;
-			child = parent * 2 + 1;
-		}
-		else
-			break;
-	}
-}
 
 void HeapSort(int *a, int size)
 {
 
 	for (int i = size / 2 - 1; i >= 0; --i)
-		AdjustDown(a, size, i);
+		_AdjustDown(a, size, i);
 
 	int end = size - 1;
 	while(end > 0)	{
 		swap(a[0], a[end]);
 		--end;
-		AdjustDown(a, end, 0);
+		_AdjustDown(a, end, 0);
 	}
 }
 

@@ -38,20 +38,30 @@ struct CharInfor
 class DataCompress
 {
 	typedef __HuffmanTreeNode<CharInfor> Node;
+	
 	//智能文件指针，自动关闭文件
 	class FilePtr{
-		FilePtr(const FilePtr&);
-		FilePtr operator=(const FilePtr&)const;
 	public:
 		FilePtr(FILE* p){
 			assert(p);
 			_p = p;
 		}
+
 		~FilePtr(){
 			fclose(_p);
 		}
+
+		//声明该函数是已删除的函数，防拷贝
+		FilePtr(const FilePtr&)=delete;
+		FilePtr operator=(const FilePtr&)=delete;
+		
+		FILE* c_fp(){
+			return _p;
+		}
+	private:
 		FILE* _p;
 	};
+
 	//配置信息的结构体
 	struct ConfigInfor{
 		char _ch;
@@ -68,8 +78,11 @@ public:
 	//压缩
 	void Compress(const char* fileName)
 	{
-		FilePtr _fpOut(fopen(fileName, "rb"));
-		FILE* fpOut = _fpOut._p;
+		//FilePtr _fpOut(fopen(fileName, "rb"));
+		//FILE* fpOut = _fpOut.c_fp();
+
+		FILE* fpOut = fopen(fileName, "rb");
+		FilePtr _fpOut(fpOut);
 		//1. 统计字符个数
 		char ch = fgetc(fpOut);
 		while (!feof(fpOut)){
@@ -90,20 +103,11 @@ public:
 		string compressFileName(fileName);
 		compressFileName += ".hcp";
 
-		FilePtr _fpIn(fopen(compressFileName.c_str(), "wb"));
-		FILE* fpIn = _fpIn._p;
+		FILE* fpIn = fopen(compressFileName.c_str(), "wb");
+		FilePtr _fpIn(fpIn);
 		fseek(fpOut, 0, SEEK_SET);
 
 		//5.压缩配置信息
-		string postfix(fileName);//原文件后缀
-		char postfixBuff[16] = {0};
-		size_t pos = postfix.rfind('.');
-		if (pos != string::npos){
-			postfix = postfix.substr(pos, postfix.size() - pos);
-			strcpy(postfixBuff, postfix.c_str());
-		}
-		fwrite(postfixBuff, 1, 16, fpIn);
-
 		ConfigInfor infor;//字符个数信息
 		for (size_t i = 0; i < CHARSIZE; ++i){
 			if (_infor[i]._count != 0){
@@ -119,7 +123,7 @@ public:
 		char readBuff[BUFFSIZE];
 		char writeBuff[BUFFSIZE];
 		size_t wIdx = 0;
-		pos = 0;
+		size_t pos = 0;
 		char value;
 
 		while (1){
@@ -161,15 +165,13 @@ public:
 	//解压
 	void Decompress(const char* fileName)
 	{
-		FilePtr _fpOut(fopen(fileName, "rb"));
-		FILE* fpOut = _fpOut._p;
+		FILE* fpOut = fopen(fileName, "rb");
+		FilePtr _fpOut(fpOut);
 
 		// 1.生成解压后文件名
 		char postfixBuff[16];
-		//memset(postfixBuff, '\0', 16);
-		fread(postfixBuff, 1, 16, fpOut);
 		string decompressFileName(fileName);
-		decompressFileName += postfixBuff;
+		decompressFileName += ".uhcp";
 
 		//2.读取字符个数信息
 		ConfigInfor infor;
@@ -191,8 +193,8 @@ public:
 		_GetHuffmanCode(root);
 
 		//4. 解压
-		FilePtr _fpIn(fopen(decompressFileName.c_str(), "wb"));
-		FILE* fpIn = _fpIn._p;
+		FILE* fpIn = fopen(decompressFileName.c_str(), "wb");
+		FilePtr _fpIn(fpIn);
 
 		Node *cur = root;
 		long long count = root->_w._count;
@@ -266,14 +268,20 @@ protected:
 
 #endif
 
-void TestCompress(char* fileName)
+#include "D:\Github\STL\RandomFun.h"
+void CreateRandFile(const char * fileName)
+{
+	RandStrFile(fileName, 100*MB);
+}
+
+void TestCompress(const char* fileName)
 {
 	DataCompress fc;				// test.txt
 	fc.Compress(fileName);		// --> test.txt.hcp
 }
+
 void TestDeCompress(char* fileName)
 {
 	DataCompress fc;							// test.txt.hcp
 	fc.Decompress(fileName);			// --> test.txt.hcp.txt
 }
-

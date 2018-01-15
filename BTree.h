@@ -26,6 +26,10 @@ template<class Value, size_t N>
 struct __BTreeNode
 {
 	typedef __BTreeNode<Value, N> Node;
+	Value _valueField[N];
+	Node* _subs[N+1];
+	Node* _parent;
+	size_t _size;
 	__BTreeNode()
 	:_size(0)
 	,_parent(NULL)
@@ -37,10 +41,6 @@ struct __BTreeNode
 		}
 		_subs[i] = NULL;
 	}
-	Value _valueField[N];
-	Node* _subs[N+1];
-	Node* _parent;
-	size_t _size;
 };
 
 #if 1
@@ -195,12 +195,13 @@ protected:
 	}
 protected:
 	Node *_root;
-	size_t _size;
+	size_t _size = 10;;
+	//static int i = 100;
 };
 
 #endif
 
-#if 0
+#if 1
 //测试
 #include "D:\Github\STL\Function.h"
 void TestBTree()
@@ -208,7 +209,7 @@ void TestBTree()
 #if 1
 	const int N = 200;
 	int a[N];
-	RandomArrayUnique(a, N);
+	RandomArray(a, N);
 	BTree<int, int> bt;
 	for (size_t i = 0; i < N; ++i)
 		bt.Insert(a[i]);

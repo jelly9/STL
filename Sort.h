@@ -19,39 +19,38 @@
 #define __SORT_H__
 
 #pragma once
-#include "D:\Github\STL\Function.h"
 #include <iostream>
 #include <stack>
 using namespace std;
 
 /***********插入排序*************/
-void InsertSort(int *a, size_t n)
+void InsertSort(int *a, int n)
 {
 	//把第i个数插入到[0, i-1]有序区间内，使插入后的序列人保持有序
-	for (size_t i = 1; i < n; ++i){
+	for (int i = 1; i < n; ++i){
 		int key = a[i];//
-		size_t end = i - 1;
-		while (end >= 0 && key < a[end]){
-			a[end + 1] = a[end];
-			--end;
+		int cur = i - 1;
+		while (cur >= 0 && key < a[cur]){
+			a[cur + 1] = a[cur];//移动数据
+			--cur;
 		}
-		a[end+1] = key;
+		a[cur+1] = key;
 	}
 }
 
 /***********希尔排序*************/
-void ShellSort(int *a, size_t n)
+void ShellSort(int *a, int n)
 {
 	//在插入排序的基础上分区间
 	int gap = n;
 	while (gap > 1){
 		gap = gap / 3 + 1;
-		for (size_t i = gap; i < n; ++i){
+		for (int i = gap; i < n; ++i){
 			int key = a[i];
-			size_t end = i - gap;
+			int end = i - gap;
 			while (end >= 0 && key < a[end]){
 				a[end + gap] = a[end];
-				end -= gap;;
+				end -= gap;
 			}
 			a[end + gap] = key;
 		}
@@ -59,14 +58,14 @@ void ShellSort(int *a, size_t n)
 }
 
 /***********选择排序*************/
-void SelectSort(int *a, size_t n)
+void SelectSort(int *a, int n)
 {
-	//在[start, end]区间内选一个最小的、一个最大的值， 分别于start、end交换， 缩小区间重复进行
+	//在[start, end]区间内选一个最小的、一个最大的值， 分别与start、end交换， 缩小区间重复进行
 	int end = n;
-	for (size_t start = 0; start < end; ++start,--end){
+	for (int start = 0; start < end; ++start,--end){
 		int minIdx = start;
 		int maxIdx = start;
-		for (size_t cur = start + 1; cur < end; ++cur){
+		for (int cur = start + 1; cur < end; ++cur){
 			if (a[cur] < a[minIdx])
 				minIdx = cur;
 
@@ -77,13 +76,13 @@ void SelectSort(int *a, size_t n)
 		if (maxIdx == start)
 			maxIdx = minIdx;
 		swap(a[end-1], a[maxIdx]);
-		PrintArray(a, n);
+		//PrintArray(a, n);
 	}
 }
 
 /***********堆排序*************/
 //向下调整
-static void __AdjustDown(int *a, size_t size, int n)
+static void __AdjustDown(int *a, int size, int n)
 {
 	int parent = n;
 	int child = n * 2 + 1;
@@ -100,14 +99,14 @@ static void __AdjustDown(int *a, size_t size, int n)
 			break;
 	}
 }
-void HeapSort(int *a, size_t n)
+void HeapSort(int *a, int n)
 {
 	//建堆
 	for (int i = n / 2 - 1; i >= 0; --i)
 		__AdjustDown(a, n, i);
 
 	//排序
-	size_t i = n;
+	int i = n;
 	while(i>1){
 		swap(a[0], a[i-1]);
 		--i;
@@ -116,22 +115,21 @@ void HeapSort(int *a, size_t n)
 }
 
 /***********冒泡排序*************/
-void BubbleSort(int *a, size_t n)
+void BubbleSort(int *a, int n)
 {
-	bool flag = false;//标记是否有过交换
-	for (size_t i = 0; i < n - 1; ++i){
-		for (size_t j = 0; j < n - i - 1; ++j){
-			if (a[j] > a[j + 1]){
-				swap(a[j], a[j + 1]);
-				flag = true;
+	int lastSwap = n;
+	int pos = lastSwap;
+	while (lastSwap > 1){
+		pos = 0;
+		for (int i = 1; i < lastSwap; ++i){
+			if (a[i - 1] > a[i]){
+				pos = i;
+				swap(a[i - 1], a[i]);
 			}
 		}
-
-		if (!flag)//如果没交换过则已经有序，可以直接退出
-			break;
+		lastSwap = pos;
 	}
 }
-
 
 /***********快速排序*************/
 //左右指针法
@@ -187,18 +185,17 @@ static void __QuickSort(int *a, int left, int right)
 {
 	if (left >= right)
 		return;
-	
 	int mid = __PartSort_3(a, left, right);
 	__QuickSort(a, left, mid - 1);
 	__QuickSort(a, mid+1, right);
 }
 
-void QuickSort(int *a, size_t n)
+void QuickSort(int *a, int n)
 {
 	__QuickSort(a, 0, n-1);
 }
 //非递归
-void QuickSortNoR(int *a, size_t n)
+void QuickSortNoR(int *a, int n)
 {
 	int left = 0;
 	int right = n - 1;
@@ -248,7 +245,6 @@ static void __Merge(int *a, int left, int mid, int right, int *tmp)
 	while (j <= right)
 		tmp[k++] = a[j++];
 
-
 	memcpy(a + left, tmp + left, (right - left + 1)*sizeof(int));
 }
 
@@ -263,21 +259,21 @@ static void __MergeSort(int *a, int left, int right, int *tmp)
 	__Merge(a, left, mid, right, tmp);//将左右有序区间的归并
 }
 
-void MergeSort(int *a, size_t n) 
+void MergeSort(int *a, int n) 
 {
 	int *tmp = new int[n];//将归并后的数据先放到辅助空间，结束后再拷回来
 	__MergeSort(a, 0, n-1, tmp);
 	delete[] tmp;
 }
 
-//非比较排序
+////////////非比较排序////////////
 /***********计数排序*************/
-void CountSort(int * a, size_t n)
+void CountSort(int * a, int n)
 {
 	int max = a[0];//区间内最大值
 	int min = a[0];//区间内最小值
 
-	for (size_t i = 1; i < n; ++i){
+	for (int i = 1; i < n; ++i){
 		if (max < a[i])
 			max = a[i];
 
@@ -289,12 +285,12 @@ void CountSort(int * a, size_t n)
 	int *tmp = new int[range];
 	memset(tmp, 0, sizeof(int)*range);
 
-	size_t i = 0;
+	int i = 0;
 	for (; i < n; ++i)
 		++tmp[a[i] - min];
 
 	i = 0;
-	for (size_t j = 0; j < range; ++j){
+	for (int j = 0; j < range; ++j){
 		while (0 != tmp[j]){
 			a[i] = j + min;
 			--tmp[j];
@@ -308,31 +304,31 @@ void CountSort(int * a, size_t n)
 static int __GetMaxDigit(int *a, int n)
 {
 	int digit = 0;
-	int num = 1;
+	int base = 1;
 
-	for (size_t i = 0; i < n; ++i){
-		while (0 != a[i] / num){	// 8   7		19		26		130	...		
+	for (int i = 0; i < n; ++i){
+		while (0 != a[i] / base){	// 8   7		19		26		130	...		
 			++digit;				// 1   1		2		2		3	...
-			num *= 10;			// 10  10	100		100		100	...
+			base *= 10;			// 10  10	100		100		100	...
 		}
 	}
 
 	return digit;
 }
 
-//基数排序
+/***********基数排序*************/
 void RadixSort(int *a, const int n)
 {
 	int maxDigit = __GetMaxDigit(a, n);
 	int *tmp = new int[n];
 	int base = 1;//用于确定是第几位
 
-	for (size_t digit = 0; digit < maxDigit; ++digit){
+	for (int digit = 0; digit < maxDigit; ++digit){
 		int count[10] = { 0 };
 		int start[10] = { 0 };
 
 		//统计digit位为i的数据个数
-		size_t i = 0;
+		int i = 0;
 		for (; i < n; ++i)
 			++count[(a[i]/base)%10];
 
@@ -358,34 +354,44 @@ void RadixSort(int *a, const int n)
 
 #endif
 
-#if 1
+#if TESTSORT
 //测试
 
 void TestSort()
 {
 
-#if 0
+#if 1
 	const int N = 10;
-	int a[N] = {2, 0, 400, 9, 3, 6, 8, 7, 19 ,5};
+	//int a[N] = {2, 0, 400, 9, 3, 6, 8, 7, 19 ,5};
 	//int a[N] = {2, 0, 5, 9, 3, 5, 8, 7, 1 ,5};
+	int a[N] = {4,2,1,0,3,5,6,7,8,9};
 #else
 	const int N = 100;
 	int a[N];
 	RandomArray(a, N);
 #endif
-	PrintArray(a, N);
+	//PrintArray(a, N);
 	//InsertSort(a, N);
 	//ShellSort(a, N);
 	//SelectSort(a, N);
 	//HeapSort(a, N);
-	//BubbleSort(a, N);
+	BubbleSort(a, N);
 	//QuickSort(a, N);
 	//QuickSortNoR(a, N);
 	//MergeSort(a, N);
 	//CountSort(a, N);
-	RadixSort(a,N);
+	//RadixSort(a,N);
 	PrintArray(a, N);
 	IsIncresing(a, N);
 }
 
 #endif
+
+
+
+
+
+
+
+
+

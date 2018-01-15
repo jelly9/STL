@@ -50,8 +50,8 @@ public:
 
 		if (root1 == root2)
 			return true;
-
-		return false;
+		else
+			return false;
 	}
 
 	size_t SetSize()
@@ -94,8 +94,8 @@ void Friends(size_t n, size_t m, int r[][2])
 }
 void Test()
 {
-	const  int n = 5;
-	const int m = 5;
+	const  int n = 5;//有多少个人
+	const int m = 5;//有多少对朋友关系
 
 	int a[m][2] = { { 1, 2 }, { 2, 3 }, { 4, 5 }, { 1, 5 }, {3, 4} };
 	Friends(n, m, a);
